@@ -1,0 +1,360 @@
+// Wallet API — Prisma schema
+// Banco: PostgreSQL | Espelha prisma/../data-model.clj
+// learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum CategoryType {
+  EXPENSE
+  INCOME
+}
+
+enum InvestmentPositionType {
+  FIXED_INCOME // Renda fixa: CDB, Tesouro, LCI...
+  STOCK // Ações
+  REAL_ESTATE_FUND // Fundos Imobiliários
+  CRYPTO
+  OTHER
+}
+
+enum InvestmentMovementType {
+  CONTRIBUTION // Aporte
+  WITHDRAWAL // Resgate
+  YIELD // Rendimento / dividendo
+}
+
+enum EmergencyFundMovementType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+// =============================================================================
+// USUÁRIOS
+// =============================================================================
+
+model User {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid // Exposto externamente via API
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  categories          Category[]
+  fixedIncomes        FixedIncome[]
+  variableIncomes     VariableIncome[]
+  fixedExpenses       FixedExpense[]
+  variableExpenses    VariableExpense[]
+  monthlyBudgets      MonthlyBudget[]
+  emergencyFund       EmergencyFund?
+  investmentPositions InvestmentPosition[]
+
+  @@map("users")
+}
+
+// =============================================================================
+// CATEGORIAS
+// userId NULL  → categoria padrão do sistema (isSystem = true)
+// =============================================================================
+
+model Category {
+  id        Int          @id @default(autoincrement())
+  userId    Int?         @map("user_id") // NULL = categoria global do sistema
+  name      String
+  color     String       @db.Char(7) // Hex color ex: #FF5733
+  icon      String? // Identificador do ícone ex: lucide:wallet
+  type      CategoryType
+  isSystem  Boolean      @default(false) @map("is_system")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  user             User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fixedIncomes     FixedIncome[]
+  variableIncomes  VariableIncome[]
+  fixedExpenses    FixedExpense[]
+  variableExpenses VariableExpense[]
+  budgetLines      BudgetLine[]
+
+  @@unique([userId, name, type], name: "uq_category_user_name_type")
+  @@index([type], name: "idx_category_type")
+  @@map("categories")
+}
+
+// =============================================================================
+// RECEITAS FIXAS
+// =============================================================================
+
+model FixedIncome {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  categoryId  Int       @map("category_id")
+  title       String
+  amount      Decimal   @db.Decimal(12, 2)
+  description String?   @db.Text
+  receiptDay  Int       @map("receipt_day") @db.SmallInt // Dia do mês esperado 1–31
+  isActive    Boolean   @default(true) @map("is_active")
+  startDate   DateTime  @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date") @db.Date // NULL = sem encerramento
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category                @relation(fields: [categoryId], references: [id])
+  settlements FixedIncomeSettlement[]
+
+  @@index([userId, isActive], name: "idx_fixed_income_user_active")
+  @@index([categoryId], name: "idx_fixed_income_category")
+  @@map("fixed_incomes")
+}
+
+/// Quitação (recebimento) de uma receita fixa em um mês específico (YYYY-MM).
+model FixedIncomeSettlement {
+  id            Int       @id @default(autoincrement())
+  fixedIncomeId Int       @map("fixed_income_id")
+  month         String    @db.Char(7) // YYYY-MM
+  received      Boolean   @default(true)
+  receivedAt    DateTime? @map("received_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  fixedIncome FixedIncome @relation(fields: [fixedIncomeId], references: [id], onDelete: Cascade)
+
+  @@unique([fixedIncomeId, month], name: "uq_fis_income_month")
+  @@index([fixedIncomeId], name: "idx_fis_income")
+  @@map("fixed_income_settlements")
+}
+
+// =============================================================================
+// RECEITAS VARIÁVEIS
+// =============================================================================
+
+model VariableIncome {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  categoryId      Int      @map("category_id")
+  title           String
+  estimatedAmount Decimal  @map("estimated_amount") @db.Decimal(12, 2)
+  actualAmount    Decimal? @map("actual_amount") @db.Decimal(12, 2) // preenchido ao receber
+  description     String?  @db.Text
+  month           String   @db.Char(7) // Formato YYYY-MM
+  isReceived      Boolean  @default(false) @map("is_received")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category             @relation(fields: [categoryId], references: [id])
+  tags     VariableIncomeTag[]
+
+  @@index([userId, month], name: "idx_variable_income_user_month")
+  @@index([categoryId], name: "idx_variable_income_category")
+  @@map("variable_incomes")
+}
+
+model VariableIncomeTag {
+  id               Int    @id @default(autoincrement())
+  variableIncomeId Int    @map("variable_income_id")
+  tag              String
+
+  variableIncome VariableIncome @relation(fields: [variableIncomeId], references: [id], onDelete: Cascade)
+
+  @@unique([variableIncomeId, tag], name: "uq_vi_tag")
+  @@index([variableIncomeId], name: "idx_vi_tags_income")
+  @@map("variable_income_tags")
+}
+
+// =============================================================================
+// DESPESAS FIXAS
+// =============================================================================
+
+model FixedExpense {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  categoryId  Int       @map("category_id")
+  title       String
+  amount      Decimal   @db.Decimal(12, 2)
+  description String?   @db.Text
+  dueDay      Int       @map("due_day") @db.SmallInt // Dia do mês de vencimento 1–31
+  isActive    Boolean   @default(true) @map("is_active")
+  startDate   DateTime  @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date") @db.Date // NULL = sem encerramento
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category                 @relation(fields: [categoryId], references: [id])
+  settlements FixedExpenseSettlement[]
+
+  @@index([userId, isActive], name: "idx_fixed_expense_user_active")
+  @@index([categoryId], name: "idx_fixed_expense_category")
+  @@map("fixed_expenses")
+}
+
+/// Quitação (pagamento) de uma despesa fixa em um mês específico (YYYY-MM).
+model FixedExpenseSettlement {
+  id             Int       @id @default(autoincrement())
+  fixedExpenseId Int       @map("fixed_expense_id")
+  month          String    @db.Char(7) // YYYY-MM
+  paid           Boolean   @default(true)
+  paidAt         DateTime? @map("paid_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  fixedExpense FixedExpense @relation(fields: [fixedExpenseId], references: [id], onDelete: Cascade)
+
+  @@unique([fixedExpenseId, month], name: "uq_fes_expense_month")
+  @@index([fixedExpenseId], name: "idx_fes_expense")
+  @@map("fixed_expense_settlements")
+}
+
+// =============================================================================
+// DESPESAS VARIÁVEIS
+// =============================================================================
+
+model VariableExpense {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  categoryId      Int      @map("category_id")
+  title           String
+  estimatedAmount Decimal  @map("estimated_amount") @db.Decimal(12, 2)
+  actualAmount    Decimal? @map("actual_amount") @db.Decimal(12, 2) // preenchido ao pagar
+  description     String?  @db.Text
+  month           String   @db.Char(7) // Formato YYYY-MM
+  isPaid          Boolean  @default(false) @map("is_paid")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category             @relation(fields: [categoryId], references: [id])
+  tags     VariableExpenseTag[]
+
+  @@index([userId, month], name: "idx_variable_expense_user_month")
+  @@index([categoryId], name: "idx_variable_expense_category")
+  @@map("variable_expenses")
+}
+
+model VariableExpenseTag {
+  id                Int    @id @default(autoincrement())
+  variableExpenseId Int    @map("variable_expense_id")
+  tag               String
+
+  variableExpense VariableExpense @relation(fields: [variableExpenseId], references: [id], onDelete: Cascade)
+
+  @@unique([variableExpenseId, tag], name: "uq_ve_tag")
+  @@index([variableExpenseId], name: "idx_ve_tags_expense")
+  @@map("variable_expense_tags")
+}
+
+// =============================================================================
+// ORÇAMENTO MENSAL
+// =============================================================================
+
+model MonthlyBudget {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  month        String   @db.Char(7) // Formato YYYY-MM
+  totalPlanned Decimal  @default(0) @map("total_planned") @db.Decimal(12, 2)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lines BudgetLine[]
+
+  @@unique([userId, month], name: "uq_budget_user_month")
+  @@map("monthly_budgets")
+}
+
+model BudgetLine {
+  id            Int     @id @default(autoincrement())
+  budgetId      Int     @map("budget_id")
+  categoryId    Int     @map("category_id")
+  plannedAmount Decimal @map("planned_amount") @db.Decimal(12, 2)
+  spentAmount   Decimal @default(0) @map("spent_amount") @db.Decimal(12, 2) // atualizado via trigger
+
+  budget   MonthlyBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category Category      @relation(fields: [categoryId], references: [id])
+
+  @@unique([budgetId, categoryId], name: "uq_budget_line")
+  @@index([budgetId], name: "idx_budget_line_budget")
+  @@map("budget_lines")
+}
+
+// =============================================================================
+// RESERVA DE EMERGÊNCIA (1:1 com usuário)
+// =============================================================================
+
+model EmergencyFund {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique @map("user_id")
+  balance      Decimal  @default(0) @db.Decimal(12, 2)
+  targetAmount Decimal  @map("target_amount") @db.Decimal(12, 2) // meta do fundo
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user      User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movements EmergencyFundMovement[]
+
+  @@map("emergency_funds")
+}
+
+model EmergencyFundMovement {
+  id          Int                       @id @default(autoincrement())
+  fundId      Int                       @map("fund_id")
+  type        EmergencyFundMovementType
+  amount      Decimal                   @db.Decimal(12, 2)
+  date        DateTime                  @db.Date
+  description String?                   @db.Text
+
+  fund EmergencyFund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+
+  @@index([fundId], name: "idx_efm_fund")
+  @@index([date], name: "idx_efm_date")
+  @@map("emergency_fund_movements")
+}
+
+// =============================================================================
+// INVESTIMENTOS
+// =============================================================================
+
+model InvestmentPosition {
+  id           Int                    @id @default(autoincrement())
+  userId       Int                    @map("user_id")
+  name         String // Ex: Tesouro IPCA+ 2029, FII XPML11
+  type         InvestmentPositionType
+  currentValue Decimal                @default(0) @map("current_value") @db.Decimal(12, 2)
+  updatedAt    DateTime               @updatedAt @map("updated_at")
+
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movements InvestmentMovement[]
+
+  @@index([userId], name: "idx_investment_user")
+  @@index([type], name: "idx_investment_type")
+  @@map("investment_positions")
+}
+
+model InvestmentMovement {
+  id          Int                    @id @default(autoincrement())
+  positionId  Int                    @map("position_id")
+  type        InvestmentMovementType
+  amount      Decimal                @db.Decimal(12, 2)
+  date        DateTime               @db.Date
+  description String?                @db.Text
+
+  position InvestmentPosition @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@index([positionId], name: "idx_im_position")
+  @@index([positionId, date], name: "idx_im_position_date")
+  @@map("investment_movements")
+}

@@ -1,0 +1,26 @@
+.layout {
+  min-height: 100svh;
+  background: var(--surface-secondary);
+}
+
+/* Coluna de conteúdo — deslocada pela sidebar fixa. */
+.main {
+  min-width: 0;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-base);
+}
+
+.layout[data-collapsed='true'] .main {
+  margin-left: var(--sidebar-width-collapsed);
+}
+
+/* A sidebar vira drawer: o conteúdo ocupa a largura total. */
+@media (max-width: 1023px) {
+  .main,
+  .layout[data-collapsed='true'] .main {
+    margin-left: 0;
+  }
+}
