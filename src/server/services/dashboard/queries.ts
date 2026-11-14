@@ -48,6 +48,8 @@ export async function getDashboardSummary(
     investmentPositions,
     investmentMovements,
     budget,
+    goals,
+    goalMovements,
   ] = await Promise.all([
     db.category.findMany({ where: { OR: [{ userId }, { userId: null }] } }),
     db.fixedIncome.findMany({ where: { userId, isActive: true } }),
@@ -69,6 +71,10 @@ export async function getDashboardSummary(
     db.monthlyBudget.findUnique({
       where: { uq_budget_user_month: { userId, month: budgetMonthKey } },
       include: { lines: true },
+    }),
+    db.goal.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
+    db.goalMovement.findMany({
+      where: { goal: { userId }, date: dateInPeriod },
     }),
   ]);
 
@@ -162,6 +168,26 @@ export async function getDashboardSummary(
     0,
   );
 
+  // Objetivos — guardar dinheiro separa do saldo disponível; resgatar devolve.
+  const goalsNet = goalMovements.reduce(
+    (sum, m) =>
+      sum + (m.type === 'DEPOSIT' ? toNumber(m.amount) : -toNumber(m.amount)),
+    0,
+  );
+  const goalsTotalSaved = goals.reduce((s, g) => s + toNumber(g.balance), 0);
+  const goalItems = goals.map((goal) => {
+    const balance = toNumber(goal.balance);
+    const targetAmount = toNumber(goal.targetAmount);
+    return {
+      id: goal.id,
+      name: goal.name,
+      color: goal.color,
+      balance,
+      targetAmount,
+      usagePercent: getBudgetUsagePercent(balance, targetAmount),
+    };
+  });
+
   return {
     period: { year, month: month ?? null },
     income: { fixed: incomeFixed, variable: incomeVariable, total: incomeTotal },
@@ -170,7 +196,7 @@ export async function getDashboardSummary(
       variable: expenseVariable,
       total: expenseTotal,
     },
-    balance: incomeTotal - expenseTotal,
+    balance: incomeTotal - expenseTotal - goalsNet,
     emergencyFund: {
       balance: emergencyFund ? toNumber(emergencyFund.balance) : 0,
       targetAmount: emergencyFund ? toNumber(emergencyFund.targetAmount) : 0,
@@ -189,6 +215,11 @@ export async function getDashboardSummary(
       totalRemaining: getRemaining(totalPlanned, totalSpent),
       usagePercent: getBudgetUsagePercent(totalSpent, totalPlanned),
       lines: budgetLines,
+    },
+    goals: {
+      totalSaved: goalsTotalSaved,
+      periodNet: goalsNet,
+      items: goalItems,
     },
   };
 }

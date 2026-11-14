@@ -1,0 +1,168 @@
+.layout {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-primary);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* Espaço para a barra de abas não cobrir o fim da página no celular. */
+  padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+}
+
+/* ------------------------------------------------ topo (computador) */
+
+.topbar {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.topbarInner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  height: var(--header-height);
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xl);
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.brand img {
+  border-radius: 10px;
+}
+
+.topnav {
+  flex: 1;
+  display: flex;
+  gap: var(--space-1);
+}
+
+.toplink {
+  height: var(--tap-min);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.toplink:hover {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.toplinkActive,
+.toplinkActive:hover {
+  background: var(--ink);
+  color: var(--text-inverse);
+  font-weight: var(--font-bold);
+}
+
+.avatar {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-full);
+  background: var(--ink);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-bold);
+  text-decoration: none;
+  outline-offset: 3px;
+}
+
+.avatarActive {
+  box-shadow: 0 0 0 3px var(--lime);
+}
+
+.toplink:focus-visible,
+.avatar:focus-visible,
+.tab:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------ abas (celular) */
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-secondary);
+}
+
+.tab {
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  font-size: 12px;
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabIcon {
+  width: 60px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+
+.tabActive {
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+}
+
+.tabActive .tabIcon {
+  background: var(--lime);
+}
+
+@media (min-width: 900px) {
+  .topbar {
+    display: block;
+  }
+
+  .tabbar {
+    display: none;
+  }
+
+  .content {
+    padding-bottom: 0;
+  }
+}

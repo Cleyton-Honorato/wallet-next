@@ -1,92 +1,38 @@
-import {
-  ArrowLeftRight,
-  BarChart3,
-  LayoutDashboard,
-  PiggyBank,
-  Repeat,
-  Shuffle,
-  Tags,
-  TrendingDown,
-  TrendingUp,
-  type LucideIcon,
-} from 'lucide-react';
+import { House, List, Target, UserRound, type LucideIcon } from 'lucide-react';
 
-export interface NavLeaf {
+export interface NavItem {
   to: string;
   label: string;
   icon: LucideIcon;
+  /** Rotas que também acendem esta aba (telas que vivem "dentro" dela). */
+  also?: string[];
 }
 
-export interface NavGroup {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-  items: NavLeaf[];
-}
-
-export type NavEntry = NavLeaf | NavGroup;
-
-export interface NavSection {
-  label: string;
-  entries: NavEntry[];
-}
-
-export function isNavGroup(entry: NavEntry): entry is NavGroup {
-  return 'items' in entry;
-}
-
-export const navSections: NavSection[] = [
+/**
+ * Quatro destinos, nada de submenus: o que antes eram 8 itens e 2 grupos
+ * agora cabe em abas que o polegar alcança. Orçamento, categorias e reserva
+ * moram no Perfil.
+ */
+export const navItems: NavItem[] = [
+  { to: '/', label: 'Início', icon: House },
+  { to: '/transactions', label: 'Lançamentos', icon: List },
+  { to: '/goals', label: 'Metas', icon: Target },
   {
-    label: 'Menu',
-    entries: [
-      { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-      {
-        id: 'expenses',
-        label: 'Despesas',
-        icon: TrendingDown,
-        items: [
-          { to: '/expenses/fixed', label: 'Fixas', icon: Repeat },
-          { to: '/expenses/variable', label: 'Variáveis', icon: Shuffle },
-        ],
-      },
-      {
-        id: 'incomes',
-        label: 'Receitas',
-        icon: TrendingUp,
-        items: [
-          { to: '/incomes/fixed', label: 'Fixas', icon: Repeat },
-          { to: '/incomes/variable', label: 'Variáveis', icon: Shuffle },
-        ],
-      },
-      { to: '/transactions', label: 'Transações', icon: ArrowLeftRight },
-    ],
-  },
-  {
-    label: 'Gestão',
-    entries: [
-      { to: '/budgets', label: 'Orçamentos', icon: PiggyBank },
-      { to: '/categories', label: 'Categorias', icon: Tags },
-      { to: '/reports', label: 'Relatórios', icon: BarChart3 },
-    ],
+    to: '/profile',
+    label: 'Perfil',
+    icon: UserRound,
+    also: ['/budgets', '/categories'],
   },
 ];
 
-/** True quando `pathname` está dentro de `to` (a raiz exige match exato). */
-export function isRouteActive(pathname: string, to: string): boolean {
+function matches(pathname: string, to: string): boolean {
   return to === '/' ? pathname === '/' : pathname.startsWith(to);
 }
 
-/** Id do grupo que contém a rota atual, se houver. */
-export function findActiveGroupId(pathname: string): string | null {
-  for (const section of navSections) {
-    for (const entry of section.entries) {
-      if (
-        isNavGroup(entry) &&
-        entry.items.some((item) => isRouteActive(pathname, item.to))
-      ) {
-        return entry.id;
-      }
-    }
-  }
-  return null;
+/** True quando `pathname` pertence à aba (a raiz exige match exato). */
+export function isNavItemActive(pathname: string, item: NavItem): boolean {
+  return (
+    matches(pathname, item.to) ||
+    (item.also ?? []).some((path) => matches(pathname, path))
+  );
 }

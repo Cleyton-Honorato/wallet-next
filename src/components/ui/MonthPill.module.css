@@ -1,0 +1,48 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: var(--tap-min);
+  border-radius: var(--radius-full);
+  background: var(--surface-card);
+  border: 1px solid var(--border-primary);
+  transition: opacity var(--transition-fast);
+}
+
+.pill[aria-busy='true'] {
+  opacity: 0.6;
+}
+
+.label {
+  min-width: 6.5em;
+  text-align: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  white-space: nowrap;
+}
+
+.arrow {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.arrow:hover:not(:disabled) {
+  background: var(--surface-secondary);
+}
+
+.arrow:disabled {
+  color: var(--color-gray-300);
+  cursor: default;
+}
+
+.arrow:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 1px;
+}

@@ -1,0 +1,217 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  /* Espaço para o botão flutuante não cobrir a última linha. */
+  padding-bottom: var(--space-20);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.03em;
+}
+
+/* ------------------------------------------------ totais */
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.total {
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.totalLabel {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+}
+
+.totalValue {
+  font-size: var(--text-xl);
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.02em;
+}
+
+.totalIn {
+  color: var(--color-income);
+}
+
+/* ------------------------------------------------ filtros */
+
+.filters {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 calc(var(--space-5) * -1);
+  padding: 2px var(--space-5);
+}
+
+.filter {
+  flex-shrink: 0;
+  height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  background: var(--surface-card);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.filterOn {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--text-inverse);
+}
+
+.filterCount {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-alert-bg);
+  color: var(--color-alert-text);
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter:focus-visible,
+.check:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------ listas */
+
+.section {
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+}
+
+.sectionTitle {
+  padding-top: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.list {
+  padding: 0;
+  margin: 0;
+}
+
+.check {
+  flex-shrink: 0;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border-primary);
+  background: var(--surface-card);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    color var(--transition-fast), transform var(--transition-fast);
+}
+
+.check:hover {
+  border-color: var(--ink);
+  color: var(--color-gray-300);
+}
+
+.check:active {
+  transform: scale(0.92);
+}
+
+.checkOn,
+.checkOn:hover {
+  background: var(--lime);
+  border-color: var(--lime);
+  color: var(--ink);
+}
+
+.check:disabled {
+  opacity: 0.5;
+}
+
+.error {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-50);
+  color: var(--color-danger-600);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+/* ------------------------------------------------ vazio */
+
+.empty {
+  padding: var(--space-10) var(--space-6);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.emptyIcon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--surface-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-extrabold);
+}
+
+.emptyText {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.deleteZone {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-secondary);
+}

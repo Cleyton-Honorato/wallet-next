@@ -6,7 +6,7 @@ import { requireUser } from '@/server/auth/session';
 import { getBudgetForMonth } from '@/server/services/budgets';
 import { listCategories } from '@/server/services/categories';
 
-export const metadata: Metadata = { title: 'Orçamentos — Wallet' };
+export const metadata: Metadata = { title: 'Limites de gasto — Wallet' };
 
 export default async function BudgetsPage({
   searchParams,

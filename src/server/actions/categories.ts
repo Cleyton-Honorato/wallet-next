@@ -20,10 +20,8 @@ import type { CategoryDto } from '@/lib/types';
 const REVALIDATE = [
   '/categories',
   '/',
-  '/expenses/fixed',
-  '/expenses/variable',
-  '/incomes/fixed',
-  '/incomes/variable',
+  '/transactions',
+  '/budgets',
 ] as const;
 
 export async function createCategoryAction(

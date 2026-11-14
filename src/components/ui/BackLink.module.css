@@ -1,0 +1,23 @@
+.back {
+  align-self: flex-start;
+  min-height: var(--tap-min);
+  margin-left: calc(var(--space-2) * -1);
+  padding: 0 var(--space-3) 0 var(--space-1);
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.back:hover {
+  background: var(--surface-card);
+}
+
+.back:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 2px;
+}

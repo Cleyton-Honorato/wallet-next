@@ -89,7 +89,7 @@ export function BudgetEditorModal({
 
   return (
     <Modal
-      title={budget.id === null ? 'Criar orçamento' : 'Editar orçamento'}
+      title={budget.id === null ? 'Definir limites' : 'Editar limites'}
       subtitle={`Defina quanto pretende gastar por categoria em ${monthLabel}.`}
       onClose={onClose}
       wide

@@ -1,34 +1,44 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
-import { cookies } from 'next/headers';
-import { COOKIES } from '@/lib/constants';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
 import './globals.css';
 
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-inter',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: 'Wallet — Finanças Pessoais',
-  description: 'Controle financeiro pessoal: despesas, receitas e orçamento.',
+  description: 'Anote seus gastos em segundos e saiba quanto sobra no mês.',
+  applicationName: 'Wallet',
+  // iOS: abre em tela cheia quando adicionado à tela de início.
+  appleWebApp: {
+    capable: true,
+    title: 'Wallet',
+    statusBarStyle: 'default',
+  },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0c0d12',
+  themeColor: '#f2f3ef',
+  // Deixa o conteúdo ir até as bordas no iPhone; os env(safe-area-inset-*)
+  // do CSS cuidam do notch e da barra de gestos.
+  viewportFit: 'cover',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Tema resolvido no servidor: evita o flash de tema errado na primeira pintura.
-  const theme = (await cookies()).get(COOKIES.THEME)?.value === 'light' ? 'light' : 'dark';
-
   return (
-    <html lang="pt-BR" data-theme={theme} className={inter.variable}>
-      <body>{children}</body>
+    <html lang="pt-BR" className={jakarta.variable}>
+      <body>
+        {children}
+        <ServiceWorkerRegister />
+      </body>
     </html>
   );
 }

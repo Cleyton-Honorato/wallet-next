@@ -6,6 +6,13 @@
  */
 
 import { getBudgetUsagePercent, getRemaining } from '@/lib/budget';
+import {
+  coversMonth,
+  isMonthPast,
+  isPastDue,
+  monthKeyOfDate,
+  toMonthKey,
+} from '@/lib/overdue';
 import type {
   ExpenseByCategoryDto,
   MatrixCellStatus,
@@ -13,6 +20,13 @@ import type {
   MatrixRowType,
 } from '@/lib/types';
 import { countActiveMonthsInPeriod, type PeriodBounds } from './period';
+
+/**
+ * A regra de vencimento é de `lib/overdue`, compartilhada com o painel de
+ * contas vencidas e com os chips das listas. Reexportada porque a matriz foi
+ * a primeira a usá-la e os testes dela continuam sendo o dono do caso.
+ */
+export { isMonthPast, isPastDue };
 
 /** Item recorrente, com valores já convertidos. */
 export interface FixedItem {
@@ -123,12 +137,11 @@ export function isActiveInMonth(
   year: number,
   monthIndex: number,
 ): boolean {
-  const monthStart = new Date(year, monthIndex, 1);
-  const monthEnd = new Date(year, monthIndex + 1, 0, 23, 59, 59, 999);
-  return (
-    item.isActive &&
-    item.startDate <= monthEnd &&
-    !(item.endDate && item.endDate < monthStart)
+  if (!item.isActive) return false;
+  return coversMonth(
+    monthKeyOfDate(item.startDate),
+    item.endDate ? monthKeyOfDate(item.endDate) : null,
+    toMonthKey(year, monthIndex),
   );
 }
 
@@ -160,32 +173,6 @@ export function aggregateMonthlySpent(
 }
 
 // ------------------------------------------------------- matriz anual
-
-/**
- * Vencimento de uma despesa fixa já passou? Compara o dia de vencimento
- * (limitado ao último dia do mês) com a data atual.
- */
-export function isPastDue(
-  year: number,
-  monthIndex: number,
-  dueDay: number,
-  now: Date = new Date(),
-): boolean {
-  const lastDay = new Date(year, monthIndex + 1, 0).getDate();
-  const day = Math.min(Math.max(dueDay, 1), lastDay);
-  const dueDate = new Date(year, monthIndex, day, 23, 59, 59, 999);
-  return dueDate < now;
-}
-
-/** Fim do mês já passou? Usado como vencimento das despesas variáveis. */
-export function isMonthPast(
-  year: number,
-  monthIndex: number,
-  now: Date = new Date(),
-): boolean {
-  const monthEnd = new Date(year, monthIndex + 1, 0, 23, 59, 59, 999);
-  return monthEnd < now;
-}
 
 /** Indexa quitações de itens fixos: id → conjunto de meses (YYYY-MM) quitados. */
 export function indexSettlements(
@@ -222,7 +209,7 @@ export function fixedRow(
       continue;
     }
 
-    const monthKey = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+    const monthKey = toMonthKey(year, monthIndex);
     if (settledSet?.has(monthKey)) {
       statuses.push('paid');
     } else if (

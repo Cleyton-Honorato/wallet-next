@@ -29,48 +29,54 @@ export function RegisterForm() {
       {formError && <div className={styles.formError}>{formError}</div>}
 
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="name">
-          Nome
-        </label>
-        <input
-          id="name"
-          type="text"
-          className={styles.input}
-          autoComplete="name"
-          {...register('name')}
-        />
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="name">
+            Nome
+          </label>
+          <input
+            id="name"
+            type="text"
+            className={styles.input}
+            autoComplete="name"
+            {...register('name')}
+          />
+        </div>
         {errors.name && (
           <span className={styles.fieldError}>{errors.name.message}</span>
         )}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="email">
-          E-mail
-        </label>
-        <input
-          id="email"
-          type="email"
-          className={styles.input}
-          autoComplete="email"
-          {...register('email')}
-        />
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="email">
+            E-mail
+          </label>
+          <input
+            id="email"
+            type="email"
+            className={styles.input}
+            autoComplete="email"
+            {...register('email')}
+          />
+        </div>
         {errors.email && (
           <span className={styles.fieldError}>{errors.email.message}</span>
         )}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="password">
-          Senha
-        </label>
-        <input
-          id="password"
-          type="password"
-          className={styles.input}
-          autoComplete="new-password"
-          {...register('password')}
-        />
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="password">
+            Senha
+          </label>
+          <input
+            id="password"
+            type="password"
+            className={styles.input}
+            autoComplete="new-password"
+            {...register('password')}
+          />
+        </div>
         {errors.password && (
           <span className={styles.fieldError}>{errors.password.message}</span>
         )}

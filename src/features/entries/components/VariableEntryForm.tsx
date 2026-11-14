@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { formatTags } from '@/lib/format';
+import { formatMonthKeyLabel } from '@/lib/month';
 import type { CategoryDto, EntryKind, VariableEntryDto } from '@/lib/types';
 import { ENTRY_LABELS } from '../labels';
-import styles from './Entries.module.css';
+import styles from './EntryForms.module.css';
 
 const formSchema = z.object({
   categoryId: z.string().min(1, 'Selecione uma categoria'),
@@ -83,7 +84,7 @@ export function VariableEntryForm({
         <div className={styles.formGridFull}>
           <Input
             id="variable-title"
-            label="Título"
+            label="Nome"
             {...register('title')}
             error={errors.title?.message}
           />
@@ -98,14 +99,14 @@ export function VariableEntryForm({
 
         <div>
           <span className={styles.fieldLabel}>Mês</span>
-          <p className={styles.rowMeta} style={{ marginTop: 'var(--space-1)' }}>
-            {monthKey}
+          <p className={styles.rowMeta}>
+            {formatMonthKeyLabel(monthKey)}
           </p>
         </div>
 
         <Input
           id="variable-estimated"
-          label="Valor estimado (R$)"
+          label="Valor previsto (R$)"
           type="number"
           step="0.01"
           min="0"

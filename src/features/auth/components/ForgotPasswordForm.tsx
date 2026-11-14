@@ -68,16 +68,18 @@ export function ForgotPasswordForm() {
         )}
 
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="email">
-            E-mail
-          </label>
-          <input
-            id="email"
-            type="email"
-            className={styles.input}
-            autoComplete="email"
-            {...register('email')}
-          />
+          <div className={styles.inputBox}>
+            <label className={styles.label} htmlFor="email">
+              E-mail
+            </label>
+            <input
+              id="email"
+              type="email"
+              className={styles.input}
+              autoComplete="email"
+              {...register('email')}
+            />
+          </div>
           {errors.email && (
             <span className={styles.fieldError}>{errors.email.message}</span>
           )}

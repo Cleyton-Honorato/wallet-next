@@ -79,6 +79,34 @@ export interface EmergencyFundDto {
   movements: EmergencyFundMovementDto[];
 }
 
+// ---------------------------------------------------------- objetivos
+
+export type GoalMovementType = 'DEPOSIT' | 'WITHDRAWAL';
+
+export interface GoalMovementDto {
+  id: number;
+  type: GoalMovementType;
+  amount: number;
+  date: string;
+  description: string | null;
+}
+
+/** Meta de poupança. `remaining`/`usagePercent`/`completed` são derivados. */
+export interface GoalDto {
+  id: number;
+  name: string;
+  icon: string | null;
+  color: string;
+  targetAmount: number;
+  balance: number;
+  remaining: number;
+  usagePercent: number;
+  completed: boolean;
+  /** 'YYYY-MM-DD' ou null quando o objetivo não tem prazo. */
+  targetDate: string | null;
+  movements: GoalMovementDto[];
+}
+
 // ----------------------------------------------------------- dashboard
 
 export interface ExpenseByCategoryDto {
@@ -126,6 +154,70 @@ export interface DashboardSummaryDto {
   investments: { totalValue: number; periodMovements: number };
   expensesByCategory: ExpenseByCategoryDto[];
   monthlyBudget: MonthlyBudgetDto;
+  /**
+   * Objetivos. `periodNet` é o quanto foi separado no período (aportes menos
+   * resgates) — já descontado de `balance`, porque guardar dinheiro num
+   * objetivo tira do saldo disponível do mês.
+   */
+  goals: {
+    totalSaved: number;
+    periodNet: number;
+    items: {
+      id: number;
+      name: string;
+      color: string;
+      balance: number;
+      targetAmount: number;
+      usagePercent: number;
+    }[];
+  };
+}
+
+// ----------------------------------------------------- contas vencidas
+
+/**
+ * Uma cobrança vencida e em aberto. Uma despesa fixa não paga há vários meses
+ * vira um item por mês — é assim que o domínio a modela, cada mês é uma
+ * cobrança própria, com sua própria quitação.
+ */
+export interface OverdueBillDto {
+  /** Identidade da cobrança (item + mês), única na lista. */
+  key: string;
+  kind: 'fixed' | 'variable';
+  /** Id do lançamento de origem, para quitar direto do painel. */
+  id: number;
+  title: string;
+  categoryName: string;
+  color: string;
+  amount: number;
+  /** Mês da cobrança, 'YYYY-MM'. */
+  month: string;
+  daysLate: number;
+}
+
+/**
+ * A próxima conta a vencer — o contraponto do painel: além do que ficou para
+ * trás, o que exige atenção a seguir. Só despesa fixa entra, porque só ela tem
+ * dia de vencimento; a variável vence com o mês e não tem "próxima".
+ */
+export interface NextBillDto {
+  id: number;
+  title: string;
+  categoryName: string;
+  color: string;
+  amount: number;
+  /** Mês da cobrança, 'YYYY-MM'. */
+  month: string;
+  /** Vencimento, 'YYYY-MM-DD'. */
+  dueDate: string;
+  daysUntil: number;
+}
+
+export interface OverdueSummaryDto {
+  total: number;
+  count: number;
+  items: OverdueBillDto[];
+  next: NextBillDto | null;
 }
 
 /** Estado de uma célula da matriz anual. */
@@ -166,3 +258,14 @@ export interface DashboardMatrixDto {
   sections: MatrixSectionDto[];
   totals: { expenses: number[]; income: number[]; leftover: number[] };
 }
+
+// ------------------------------------------------- lançamentos do mês
+
+/**
+ * Um lançamento qualquer do mês, na forma que a lista única de "Lançamentos"
+ * e o Início consomem. Carrega o DTO original para a edição reaproveitar os
+ * formulários de fixo e variável sem nova ida ao servidor.
+ */
+export type MonthEntryDto =
+  | { key: string; source: 'fixed'; kind: EntryKind; entry: FixedEntryDto }
+  | { key: string; source: 'variable'; kind: EntryKind; entry: VariableEntryDto };

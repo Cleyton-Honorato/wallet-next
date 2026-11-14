@@ -8,8 +8,6 @@ export const DEFAULT_LOCALE = 'pt-BR';
 /** Cookies (o de sessão é httpOnly e vive só no servidor). */
 export const COOKIES = {
   SESSION: 'wallet_session',
-  THEME: 'wallet_theme',
-  SIDEBAR_COLLAPSED: 'wallet_sidebar_collapsed',
 } as const;
 
 export const DASHBOARD_AVAILABLE_YEARS = [2024, 2025, 2026] as const;

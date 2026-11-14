@@ -15,7 +15,7 @@ import type { ActionResult } from '@/lib/result';
 import type { EmergencyFundDto } from '@/lib/types';
 
 /** A reserva só aparece no dashboard. */
-const REVALIDATE = ['/'] as const;
+const REVALIDATE = ['/', '/goals', '/profile'] as const;
 
 export async function updateEmergencyFundAction(
   input: UpdateEmergencyFundInput,

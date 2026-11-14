@@ -45,15 +45,11 @@ import type { EntryKind, FixedEntryDto, VariableEntryDto } from '@/lib/types';
  * As quatro telas de lançamento compartilham estas actions; `kind` apenas
  * escolhe a tabela. O `userId` continua vindo só da sessão.
  *
- * Toda mutação revalida a própria tela e o dashboard, que agrega os quatro.
+ * Toda mutação revalida a lista de lançamentos e o Início, que agrega os quatro.
  */
-function fixedPaths(kind: EntryKind) {
-  return [kind === 'expense' ? '/expenses/fixed' : '/incomes/fixed', '/'];
-}
-
-function variablePaths(kind: EntryKind) {
-  return [kind === 'expense' ? '/expenses/variable' : '/incomes/variable', '/'];
-}
+// Toda tela de lançamento agora é a lista única de /transactions, para
+// despesa e receita, fixo e variável.
+const ENTRY_PATHS = ['/transactions', '/'] as const;
 
 // ---------------------------------------------------------------- fixos
 
@@ -64,7 +60,7 @@ export async function createFixedEntryAction(
   return authAction({
     schema: createFixedEntrySchema,
     input,
-    revalidate: fixedPaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: (data, user) =>
       kind === 'expense'
         ? createFixedExpense(user.userId, data)
@@ -79,7 +75,7 @@ export async function updateFixedEntryAction(
   return authAction({
     schema: updateFixedEntrySchema,
     input,
-    revalidate: fixedPaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: ({ id, ...data }, user) =>
       kind === 'expense'
         ? updateFixedExpense(user.userId, id, data)
@@ -94,7 +90,7 @@ export async function deleteFixedEntryAction(
   return authAction({
     schema: deleteEntrySchema,
     input,
-    revalidate: fixedPaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: ({ id }, user) =>
       kind === 'expense'
         ? deleteFixedExpense(user.userId, id)
@@ -109,7 +105,7 @@ export async function settleFixedEntryAction(
   return authAction({
     schema: settleFixedEntrySchema,
     input,
-    revalidate: fixedPaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: ({ id, month, settled }, user) =>
       kind === 'expense'
         ? settleFixedExpense(user.userId, id, month, settled)
@@ -126,7 +122,7 @@ export async function createVariableEntryAction(
   return authAction({
     schema: createVariableEntrySchema,
     input,
-    revalidate: variablePaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: (data, user) =>
       kind === 'expense'
         ? createVariableExpense(user.userId, data)
@@ -141,7 +137,7 @@ export async function updateVariableEntryAction(
   return authAction({
     schema: updateVariableEntrySchema,
     input,
-    revalidate: variablePaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: ({ id, ...data }, user) =>
       kind === 'expense'
         ? updateVariableExpense(user.userId, id, data)
@@ -156,7 +152,7 @@ export async function deleteVariableEntryAction(
   return authAction({
     schema: deleteEntrySchema,
     input,
-    revalidate: variablePaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: ({ id }, user) =>
       kind === 'expense'
         ? deleteVariableExpense(user.userId, id)
@@ -171,7 +167,7 @@ export async function bulkSettleVariableEntriesAction(
   return authAction({
     schema: bulkSettleVariableEntrySchema,
     input,
-    revalidate: variablePaths(kind),
+    revalidate: ENTRY_PATHS,
     handler: ({ categoryId, month, settled }, user) =>
       kind === 'expense'
         ? bulkSettleVariableExpenses(user.userId, categoryId, month, settled)

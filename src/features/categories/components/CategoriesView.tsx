@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { BackLink } from '@/components/ui/BackLink';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/cn';
 import type { CategoryDto, CategoryType } from '@/lib/types';
@@ -29,7 +30,7 @@ function CategoryCard({
             className={styles.iconContainer}
             style={{ backgroundColor: `${category.color}22` }}
           >
-            <CategoryIcon name={category.icon} size={22} color={category.color} />
+            <CategoryIcon name={category.icon} label={category.name} size={22} color={category.color} />
           </div>
           <div className={styles.categoryMeta}>
             <span className={styles.categoryName}>{category.name}</span>
@@ -39,7 +40,7 @@ function CategoryCard({
                 isIncome ? styles.badgeIncome : styles.badgeExpense,
               )}
             >
-              {isIncome ? 'Receita' : 'Despesa'}
+              {isIncome ? 'Entrada' : 'Gasto'}
             </span>
           </div>
         </div>
@@ -52,7 +53,7 @@ function CategoryCard({
               onClick={onEdit}
               aria-label={`Editar ${category.name}`}
             >
-              <Pencil size={14} />
+              <Pencil size={18} />
             </button>
             <button
               className={cn(styles.actionBtn, styles.actionBtnDanger)}
@@ -60,7 +61,7 @@ function CategoryCard({
               onClick={onDelete}
               aria-label={`Excluir ${category.name}`}
             >
-              <Trash2 size={14} />
+              <Trash2 size={18} />
             </button>
           </div>
         )}
@@ -106,11 +107,12 @@ export function CategoriesView({ categories }: { categories: CategoryDto[] }) {
 
   return (
     <div className={styles.page}>
+      <BackLink href="/profile" label="Perfil" />
       <div className={styles.header}>
         <div className={styles.intro}>
           <h1 className={styles.title}>Categorias</h1>
           <p className={styles.subtitle}>
-            Gerencie suas categorias de receitas e despesas
+            Organize seus gastos e entradas do seu jeito
           </p>
         </div>
         <Button variant="primary" icon={<Plus size={16} />} onClick={openCreate}>
@@ -119,23 +121,6 @@ export function CategoriesView({ categories }: { categories: CategoryDto[] }) {
       </div>
 
       {error && <p className={styles.error}>{error}</p>}
-
-      <div className={styles.summaryGrid}>
-        <div className={styles.summaryCard}>
-          <p className={styles.summaryLabel}>Receitas</p>
-          <p className={cn(styles.summaryValue, styles.summaryValueIncome)}>
-            {incomeCategories.length}
-          </p>
-          <p className={styles.summaryLabel}>categorias de receita</p>
-        </div>
-        <div className={styles.summaryCard}>
-          <p className={styles.summaryLabel}>Despesas</p>
-          <p className={cn(styles.summaryValue, styles.summaryValueExpense)}>
-            {expenseCategories.length}
-          </p>
-          <p className={styles.summaryLabel}>categorias de despesa</p>
-        </div>
-      </div>
 
       <div className={styles.tabs}>
         <div className={styles.tabList} role="tablist">
@@ -150,9 +135,9 @@ export function CategoriesView({ categories }: { categories: CategoryDto[] }) {
           >
             <span
               className={styles.tabDot}
-              style={{ backgroundColor: '#16a34a' }}
+              style={{ backgroundColor: 'var(--color-income)' }}
             />
-            Receitas ({incomeCategories.length})
+            Entradas ({incomeCategories.length})
           </button>
           <button
             role="tab"
@@ -165,16 +150,16 @@ export function CategoriesView({ categories }: { categories: CategoryDto[] }) {
           >
             <span
               className={styles.tabDot}
-              style={{ backgroundColor: '#dc2626' }}
+              style={{ backgroundColor: 'var(--ink)' }}
             />
-            Despesas ({expenseCategories.length})
+            Gastos ({expenseCategories.length})
           </button>
         </div>
 
         {visible.length === 0 ? (
           <p className={styles.empty}>
             Nenhuma categoria de{' '}
-            {activeTab === 'INCOME' ? 'receita' : 'despesa'} cadastrada.
+            {activeTab === 'INCOME' ? 'entrada' : 'gasto'} cadastrada.
           </p>
         ) : (
           <div className={styles.categoryGrid}>

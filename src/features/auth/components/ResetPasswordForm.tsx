@@ -51,48 +51,54 @@ export function ResetPasswordForm() {
       {formError && <div className={styles.formError}>{formError}</div>}
 
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="token">
-          Código de redefinição
-        </label>
-        <input
-          id="token"
-          type="text"
-          className={styles.input}
-          autoComplete="off"
-          {...register('token')}
-        />
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="token">
+            Código de redefinição
+          </label>
+          <input
+            id="token"
+            type="text"
+            className={styles.input}
+            autoComplete="off"
+            {...register('token')}
+          />
+        </div>
         {errors.token && (
           <span className={styles.fieldError}>{errors.token.message}</span>
         )}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="password">
-          Nova senha
-        </label>
-        <input
-          id="password"
-          type="password"
-          className={styles.input}
-          autoComplete="new-password"
-          {...register('password')}
-        />
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="password">
+            Nova senha
+          </label>
+          <input
+            id="password"
+            type="password"
+            className={styles.input}
+            autoComplete="new-password"
+            {...register('password')}
+          />
+        </div>
         {errors.password && (
           <span className={styles.fieldError}>{errors.password.message}</span>
         )}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="confirmPassword">
-          Confirmar nova senha
-        </label>
-        <input
-          id="confirmPassword"
-          type="password"
-          className={styles.input}
-          autoComplete="new-password"
-          {...register('confirmPassword')}
-        />
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="confirmPassword">
+            Confirmar nova senha
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            className={styles.input}
+            autoComplete="new-password"
+            {...register('confirmPassword')}
+          />
+        </div>
         {errors.confirmPassword && (
           <span className={styles.fieldError}>
             {errors.confirmPassword.message}

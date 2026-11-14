@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useModalBehavior } from './useModalBehavior';
 import styles from './Modal.module.css';
@@ -63,10 +64,22 @@ export function Modal({
       onClose={onClose}
       className={cn(wide && styles.modalWide)}
     >
-      <h3 id={titleId} className={styles.title}>
-        {title}
-      </h3>
-      {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      <div className={styles.head}>
+        <div>
+          <h2 id={titleId} className={styles.title}>
+            {title}
+          </h2>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </div>
+        <button
+          type="button"
+          className={styles.close}
+          onClick={onClose}
+          aria-label="Fechar"
+        >
+          <X size={20} />
+        </button>
+      </div>
       {children}
     </ModalShell>
   );

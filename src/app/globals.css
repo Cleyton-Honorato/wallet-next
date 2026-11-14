@@ -4,8 +4,6 @@
 @import "../styles/reset.css";
 @import "../styles/animations.css";
 
-@custom-variant dark (&:is([data-theme="dark"] *));
-
 @theme inline {
   --color-background: var(--surface-primary);
   --color-foreground: var(--text-primary);
@@ -50,5 +48,6 @@
   body {
     background-color: var(--surface-primary);
     color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
   }
 }

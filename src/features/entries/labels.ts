@@ -17,6 +17,9 @@ interface EntryLabels {
   settleAction: string;
   settledStatus: string;
   pendingStatus: string;
+  /** Só a despesa vence; na receita estes textos nunca são renderizados. */
+  overdueStatus: string;
+  overdueCountLabel: string;
   settledCountLabel: string;
   amountPaidLabel: string;
   markAsSettled: string;
@@ -46,6 +49,8 @@ export const ENTRY_LABELS: Record<EntryKind, EntryLabels> = {
     settleAction: 'Pagar',
     settledStatus: 'Paga no mês',
     pendingStatus: 'Pendente',
+    overdueStatus: 'Vencida',
+    overdueCountLabel: 'Vencidas',
     settledCountLabel: 'Pagas no mês',
     amountPaidLabel: 'Valor pago (R$)',
     markAsSettled: 'Marcar como paga',
@@ -74,6 +79,8 @@ export const ENTRY_LABELS: Record<EntryKind, EntryLabels> = {
     settleAction: 'Receber',
     settledStatus: 'Recebida no mês',
     pendingStatus: 'Pendente',
+    overdueStatus: 'Atrasada',
+    overdueCountLabel: 'Atrasadas',
     settledCountLabel: 'Recebidas no mês',
     amountPaidLabel: 'Valor recebido (R$)',
     markAsSettled: 'Marcar como recebida',

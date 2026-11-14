@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/Select';
 import { formatDateForInput } from '@/lib/format';
 import type { CategoryDto, EntryKind, FixedEntryDto } from '@/lib/types';
 import { ENTRY_LABELS } from '../labels';
-import styles from './Entries.module.css';
+import styles from './EntryForms.module.css';
 
 /** Espelha `fixedEntrySchema`, mas com os tipos que um <form> produz. */
 const formSchema = z.object({
@@ -82,7 +82,7 @@ export function FixedEntryForm({
         <div className={styles.formGridFull}>
           <Input
             id="fixed-title"
-            label="Título"
+            label="Nome"
             {...register('title')}
             error={errors.title?.message}
           />

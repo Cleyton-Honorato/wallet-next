@@ -1,14 +1,14 @@
 .container {
   flex: 1;
-  padding: var(--space-6);
+  width: 100%;
   max-width: var(--content-max-width);
   margin: 0 auto;
-  width: 100%;
-  animation: fadeInUp var(--transition-base) ease-out;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  animation: fadeIn var(--transition-base) ease-out;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 900px) {
   .container {
-    padding: var(--space-4);
+    padding: var(--space-8) var(--space-6) var(--space-12);
   }
 }

@@ -1,34 +1,42 @@
 import { PageContainer } from '@/components/layout/PageContainer';
-import { DashboardView } from '@/features/dashboard/components/DashboardView';
-import { resolvePeriod } from '@/lib/period-label';
+import { HomeView } from '@/features/home/HomeView';
+import { resolveMonthKey } from '@/lib/month';
 import { requireUser } from '@/server/auth/session';
+import { listCategories } from '@/server/services/categories';
+import { getDashboardSummary } from '@/server/services/dashboard/queries';
 import { getEmergencyFund } from '@/server/services/emergency-fund';
-import {
-  getAnnualMatrix,
-  getDashboardSummary,
-} from '@/server/services/dashboard/queries';
+import { listMonthEntries } from '@/server/services/month-entries';
+import { getOverdueBills } from '@/server/services/overdue';
 
-export default async function DashboardPage({
+export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ year?: string; month?: string }>;
+  searchParams: Promise<{ month?: string }>;
 }) {
   const user = await requireUser();
-  const period = resolvePeriod(await searchParams);
+  const monthKey = resolveMonthKey((await searchParams).month);
+  const [year, month] = monthKey.split('-').map(Number);
 
-  const [summary, matrix, fund] = await Promise.all([
-    getDashboardSummary(user.userId, period),
-    getAnnualMatrix(user.userId, period.year),
+  // Contas vencidas não recebem o mês de propósito: é um alerta sobre hoje,
+  // não sobre o recorte que o usuário escolheu olhar.
+  const [summary, overdue, fund, entries, categories] = await Promise.all([
+    getDashboardSummary(user.userId, { year, month }),
+    getOverdueBills(user.userId),
     getEmergencyFund(user.userId),
+    listMonthEntries(user.userId, monthKey),
+    listCategories(user.userId),
   ]);
 
   return (
     <PageContainer>
-      <DashboardView
-        period={period}
+      <HomeView
+        userName={user.name}
+        monthKey={monthKey}
         summary={summary}
-        matrix={matrix}
+        overdue={overdue}
         fund={fund}
+        entries={entries}
+        categories={categories}
       />
     </PageContainer>
   );

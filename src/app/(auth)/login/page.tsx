@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: 'Entrar — Wallet' };
 export default function LoginPage() {
   return (
     <AuthCard
-      subtitle="Entre na sua conta"
+      subtitle="Que bom te ver de novo"
       footer={
         <>
           Não tem conta? <Link href="/register">Criar conta</Link>

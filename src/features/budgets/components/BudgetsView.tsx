@@ -5,7 +5,8 @@ import { Copy, PiggyBank, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Panel } from '@/components/ui/Panel';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { MonthNavigator } from '@/features/entries/components/MonthNavigator';
+import { BackLink } from '@/components/ui/BackLink';
+import { MonthPill } from '@/components/ui/MonthPill';
 import { getBudgetStatus } from '@/lib/budget';
 import { cn } from '@/lib/cn';
 import { formatCurrency } from '@/lib/format';
@@ -61,7 +62,7 @@ export function BudgetsView({
   const handleDelete = () => {
     if (
       !window.confirm(
-        `Excluir o orçamento de ${monthLabel}? As categorias e os lançamentos não são afetados.`,
+        `Apagar os limites de ${monthLabel}? Categorias e lançamentos não são afetados.`,
       )
     ) {
       return;
@@ -75,22 +76,23 @@ export function BudgetsView({
 
   return (
     <div className={styles.page}>
+      <BackLink href="/profile" label="Perfil" />
       <div className={styles.header}>
         <div className={styles.intro}>
-          <h1 className={styles.title}>Orçamentos</h1>
+          <h1 className={styles.title}>Limites de gasto</h1>
           <p className={styles.subtitle}>
-            Defina quanto pretende gastar por categoria e acompanhe o mês
+            Diga quanto quer gastar em cada categoria e veja se está dentro
           </p>
         </div>
         <div className={styles.controls}>
-          <MonthNavigator monthKey={monthKey} allowFuture />
+          <MonthPill monthKey={monthKey} allowFuture />
           {hasBudget && (
             <Button
               variant="primary"
               icon={<Pencil size={16} />}
               onClick={() => setEditorOpen(true)}
             >
-              Editar orçamento
+              Editar limites
             </Button>
           )}
         </div>
@@ -99,15 +101,15 @@ export function BudgetsView({
       {error && <p className={styles.error}>{error}</p>}
 
       {!hasBudget ? (
-        <Panel title={`Orçamento de ${monthLabel}`}>
+        <Panel title={`Limites de ${monthLabel}`}>
           <div className={styles.empty}>
             <PiggyBank size={44} className={styles.emptyIcon} />
             <p className={styles.emptyTitle}>
-              Nenhum orçamento definido para {monthLabel}
+              Nenhum limite definido para {monthLabel}
             </p>
             <p className={styles.emptyText}>
-              Um orçamento define um limite de gasto por categoria. Com ele,
-              você acompanha o quanto já foi consumido antes de o mês fechar.
+              Ex.: no máximo R$ 800 em mercado. Você acompanha o quanto já
+              gastou antes de o mês fechar.
             </p>
             <div className={styles.emptyActions}>
               <Button
@@ -116,7 +118,7 @@ export function BudgetsView({
                 onClick={() => setEditorOpen(true)}
                 disabled={categories.length === 0}
               >
-                Criar orçamento
+                Definir limites
               </Button>
               {previousLines.length > 0 && (
                 <Button
@@ -133,7 +135,7 @@ export function BudgetsView({
             </div>
             {categories.length === 0 && (
               <p className={styles.emptyText}>
-                Cadastre categorias de despesa antes de montar um orçamento.
+                Cadastre categorias de gasto antes de definir limites.
               </p>
             )}
           </div>
@@ -172,7 +174,7 @@ export function BudgetsView({
             </div>
           </div>
 
-          <Panel title={`Orçamento de ${monthLabel}`}>
+          <Panel title={`Limites de ${monthLabel}`}>
             <ul className={styles.lines}>
               {budget.lines.map((line) => {
                 const over = line.spentAmount > line.plannedAmount;
@@ -221,7 +223,7 @@ export function BudgetsView({
                 onClick={handleDelete}
                 disabled={isPending}
               >
-                Excluir orçamento
+                Apagar limites
               </Button>
             </div>
           </Panel>

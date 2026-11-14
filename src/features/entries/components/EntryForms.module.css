@@ -1,0 +1,96 @@
+.formError {
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-50);
+  color: var(--color-danger-600);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.formGridFull {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 480px) {
+  .formGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.fieldLabel {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+}
+
+.rowMeta {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-base);
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 4px var(--color-primary-100);
+}
+
+.checkboxRow {
+  min-height: 56px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.checkboxRow input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--ink);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .formActions {
+    flex-direction: column-reverse;
+  }
+
+  .formActions > * {
+    width: 100%;
+  }
+}

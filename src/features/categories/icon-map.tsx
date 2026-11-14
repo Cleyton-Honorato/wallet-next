@@ -75,8 +75,51 @@ const ICONS = {
 
 export type CategoryIconName = keyof typeof ICONS;
 
-function resolveCategoryIcon(name: string | null | undefined): LucideIcon {
+/**
+ * Categorias sem ícone salvo (as do sistema, por exemplo) ganham um pelo
+ * nome. Chaves já normalizadas: minúsculas e sem acento.
+ */
+const ICON_BY_LABEL: [RegExp, CategoryIconName][] = [
+  [/moradia|casa|aluguel|condominio/, 'Home'],
+  [/mercado|supermercado|feira/, 'ShoppingCart'],
+  [/aliment|comida|restaurante|lanche|delivery/, 'UtensilsCrossed'],
+  [/transporte|uber|onibus|carro/, 'Car'],
+  [/combustivel|gasolina/, 'Fuel'],
+  [/saude|farmacia|medic/, 'Heart'],
+  [/educa|curso|escola|faculdade/, 'GraduationCap'],
+  [/lazer|diversao|jogo|streaming/, 'Gamepad2'],
+  [/conta|luz|energia|agua/, 'Zap'],
+  [/internet/, 'Wifi'],
+  [/telefone|celular/, 'Phone'],
+  [/viagem/, 'Plane'],
+  [/roupa|vestuario/, 'Shirt'],
+  [/pet|animal/, 'PawPrint'],
+  [/cartao|credito/, 'CreditCard'],
+  [/salario/, 'Briefcase'],
+  [/freela|servico/, 'Laptop'],
+  [/invest|rendimento|dividendo/, 'TrendingUp'],
+  [/venda/, 'ShoppingBag'],
+  [/presente|doacao/, 'Gift'],
+  [/bonus|premio|13/, 'Award'],
+];
+
+function normalize(label: string): string {
+  return label
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function resolveCategoryIcon(
+  name: string | null | undefined,
+  label?: string,
+): LucideIcon {
   if (name && name in ICONS) return ICONS[name as CategoryIconName];
+  if (label) {
+    const key = normalize(label);
+    const match = ICON_BY_LABEL.find(([pattern]) => pattern.test(key));
+    if (match) return ICONS[match[1]];
+  }
   return Tag;
 }
 
@@ -89,22 +132,20 @@ function resolveCategoryIcon(name: string | null | undefined): LucideIcon {
  */
 export function CategoryIcon({
   name,
+  label,
   size,
   color,
 }: {
   name: string | null | undefined;
+  /** Nome da categoria — usado para escolher um ícone quando `name` falta. */
+  label?: string;
   size: number;
   color?: string;
 }) {
-  return createElement(resolveCategoryIcon(name), { size, color });
+  return createElement(resolveCategoryIcon(name, label), { size, color });
 }
 
-export const AVAILABLE_COLORS = [
-  '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16',
-  '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
-  '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF',
-  '#EC4899', '#F43F5E', '#64748B', '#6B7280', '#374151',
-] as const;
+export { AVAILABLE_COLORS } from '@/lib/palette';
 
 export const AVAILABLE_ICONS: Record<CategoryType, CategoryIconName[]> = {
   INCOME: [

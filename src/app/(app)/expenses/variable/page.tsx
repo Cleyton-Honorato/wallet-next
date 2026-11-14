@@ -1,34 +1,11 @@
-import type { Metadata } from 'next';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { VariableEntriesView } from '@/features/entries/components/VariableEntriesView';
-import { resolveMonthKey } from '@/lib/month';
-import { requireUser } from '@/server/auth/session';
-import { listCategories } from '@/server/services/categories';
-import { listVariableExpenses } from '@/server/services/variable-expenses';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = { title: 'Despesas Variáveis — Wallet' };
-
-export default async function VariableExpensesPage({
+/** As quatro telas antigas viraram a lista única de Lançamentos. */
+export default async function LegacyEntriesPage({
   searchParams,
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
-  const user = await requireUser();
-  const monthKey = resolveMonthKey((await searchParams).month);
-
-  const [entries, categories] = await Promise.all([
-    listVariableExpenses(user.userId, monthKey),
-    listCategories(user.userId),
-  ]);
-
-  return (
-    <PageContainer>
-      <VariableEntriesView
-        kind="expense"
-        monthKey={monthKey}
-        entries={entries}
-        categories={categories.filter((c) => c.type === 'EXPENSE')}
-      />
-    </PageContainer>
-  );
+  const { month } = await searchParams;
+  redirect(`/transactions?show=out${month ? `&month=${month}` : ''}`);
 }
