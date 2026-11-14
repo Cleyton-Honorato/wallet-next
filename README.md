@@ -33,16 +33,35 @@ Usuário de demonstração após `npm run db:seed`: `demo@wallet.com` / `demo123
 
 | Script | O que faz |
 |---|---|
-| `npm run dev` | Servidor de desenvolvimento em http://localhost:3000 |
+| `npm run dev` | Aplica migrations pendentes e sobe o servidor em http://localhost:3000 |
 | `npm run build` / `npm start` | Build de produção e execução |
 | `npm test` | Testes (Vitest) |
 | `npm run lint` | ESLint |
 | `npm run db:status` | Confere se as migrations do banco estão em dia |
+| `npm run db:migrate` | Aplica as migrations pendentes (só `migrate deploy`, nunca reset) |
 | `npm run db:seed` | Cria o usuário demo e as categorias de sistema |
 | `npm run db:studio` | Prisma Studio |
 
 > Nunca rode `prisma migrate reset` ou `db push`: o banco é compartilhado com o
 > projeto antigo e contém dados reais.
+
+### Migrations automáticas
+
+Como o `migrationsRun: true` do backend da Academe, as migrations pendentes são
+aplicadas sozinhas por `scripts/migrate.mjs`:
+
+- **Local:** no `npm run dev` (script `predev`).
+- **Vercel:** no deploy de **produção**, antes do `next build` (script
+  `vercel-build`). Se a migration falhar, o deploy falha e a versão anterior
+  continua no ar. Deploys de preview pulam a migração, porque usam o mesmo banco.
+
+Na Vercel, defina `DATABASE_URL_UNPOOLED` com a conexão **direta** do Neon (sem
+`-pooler` no host) — a integração Neon ↔ Vercel já cria essa variável. Sem ela,
+o script usa `DATABASE_URL`.
+
+Escreva migrations que o código anterior aguente (adicionar tabela/coluna,
+não renomear ou apagar de uma vez): o banco é migrado alguns instantes antes de
+a nova versão entrar no ar.
 
 ## Estrutura
 
