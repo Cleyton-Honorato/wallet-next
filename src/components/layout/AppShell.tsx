@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { isNavItemActive, navItems } from './navItems';
+import { TabBar } from './TabBar';
 import styles from './AppShell.module.css';
 
 interface AppShellProps {
@@ -16,7 +17,7 @@ interface AppShellProps {
 /**
  * Casca da aplicação.
  *
- * - Celular: só o conteúdo e uma barra de 4 abas fixa embaixo.
+ * - Celular: só o conteúdo e a barra de abas flutuante (TabBar).
  * - Computador: barra no topo com as mesmas abas e o avatar levando ao Perfil.
  */
 export function AppShell({ user, children }: AppShellProps) {
@@ -65,24 +66,7 @@ export function AppShell({ user, children }: AppShellProps) {
 
       <div className={styles.content}>{children}</div>
 
-      <nav aria-label="Navegação principal" className={styles.tabbar}>
-        {navItems.map((item) => {
-          const active = isNavItemActive(pathname, item);
-          return (
-            <Link
-              key={item.to}
-              href={item.to}
-              aria-current={active ? 'page' : undefined}
-              className={cn(styles.tab, active && styles.tabActive)}
-            >
-              <span className={styles.tabIcon}>
-                <item.icon size={22} strokeWidth={active ? 2.4 : 2} />
-              </span>
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <TabBar />
     </div>
   );
 }

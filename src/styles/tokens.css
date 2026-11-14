@@ -180,6 +180,10 @@
 
   /* === Layout === */
   --header-height: 72px;
-  --tabbar-height: 76px;
+  /* Barra de abas flutuante (celular): altura, folga das bordas e o espaço
+     total que ela cobre no fim da tela — usado pelo conteúdo e pelo Anotar. */
+  --tabbar-height: 64px;
+  --tabbar-gap: 12px;
+  --tabbar-space: calc(var(--tabbar-height) + var(--tabbar-gap) * 2 + env(safe-area-inset-bottom));
   --content-max-width: 1120px;
 }

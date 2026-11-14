@@ -1,0 +1,112 @@
+.yearRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--surface-secondary);
+}
+
+.year {
+  font-size: var(--text-xl);
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.02em;
+}
+
+.yearArrow {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.yearArrow:disabled {
+  background: transparent;
+  color: var(--color-gray-300);
+  cursor: default;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2-5);
+}
+
+.month {
+  position: relative;
+  height: 56px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--surface-secondary);
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.month:hover:not(:disabled) {
+  border-color: var(--border-primary);
+}
+
+.month:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+/* Mês atual: um ponto embaixo do nome. */
+.monthCurrent::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--ink);
+  transform: translateX(-50%);
+}
+
+.monthSelected,
+.monthSelected:hover:not(:disabled) {
+  background: var(--lime);
+  border-color: var(--ink);
+}
+
+.month:disabled {
+  background: transparent;
+  color: var(--color-gray-300);
+  cursor: default;
+}
+
+.today {
+  width: 100%;
+  min-height: var(--tap-min);
+  margin-top: var(--space-4);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.yearArrow:focus-visible,
+.month:focus-visible,
+.today:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 2px;
+}

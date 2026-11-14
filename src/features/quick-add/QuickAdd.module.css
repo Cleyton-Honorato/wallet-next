@@ -8,15 +8,62 @@
 }
 
 .form {
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 }
 
+/* ------------------------------------------------ tela cheia no celular */
+
+/*
+ * Classe dobrada para vencer o .modal do Modal.module.css sem depender da
+ * ordem de carregamento dos dois arquivos.
+ */
+@media (max-width: 640px) {
+  .sheet.sheet {
+    height: 100svh;
+    max-height: none;
+    border-radius: 0;
+    padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--space-5)
+      calc(var(--space-4) + env(safe-area-inset-bottom));
+  }
+
+  .sheet.sheet::before {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------ topo: X + Gastei/Recebi */
+
+.top {
+  display: grid;
+  grid-template-columns: var(--tap-min) minmax(0, 1fr) var(--tap-min);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.close {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.topSpacer {
+  width: var(--tap-min);
+}
+
 /* ------------------------------------------------ Gastei / Recebi */
 
 .kindToggle {
-  align-self: center;
+  justify-self: center;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: min(100%, 260px);
@@ -199,6 +246,39 @@
   box-shadow: 0 0 0 4px var(--color-primary-100);
 }
 
+/* ------------------------------------------------ quando foi */
+
+.dateBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.chip {
+  height: var(--tap-min);
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  background: var(--surface-card);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.chipOn {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--text-inverse);
+}
+
 /* ------------------------------------------------ repete todo mês */
 
 .switchRow {
@@ -262,6 +342,8 @@
 
 .kindBtn:focus-visible,
 .cat:focus-visible,
+.chip:focus-visible,
+.close:focus-visible,
 .switchRow:focus-visible {
   outline: 3px solid var(--lime-strong);
   outline-offset: 2px;
@@ -277,18 +359,11 @@
 }
 
 .footer {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.footer > :first-child {
-  flex-shrink: 0;
-  padding: 0 var(--space-4);
-}
-
-.save {
-  flex: 1;
-  min-width: 0;
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  background: var(--surface-elevated);
 }
 
 /* ------------------------------------------------ gatilhos */
@@ -365,7 +440,7 @@
 .fab {
   position: fixed;
   right: var(--space-5);
-  bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + var(--space-4));
+  bottom: calc(var(--tabbar-space) + var(--space-1));
   z-index: var(--z-sticky);
   height: 60px;
   padding: 0 var(--space-6) 0 var(--space-5);

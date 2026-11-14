@@ -1,0 +1,242 @@
+/* ============================================================
+   Loading — o único visual de carregamento do app.
+   ============================================================ */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Começa invisível e só surge depois de 150ms: carregamentos rápidos não
+   piscam um esqueleto que some no quadro seguinte. */
+.page,
+.brand {
+  animation: appear 280ms ease-out 150ms both;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------ esqueleto (page) */
+
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+}
+
+@media (min-width: 900px) {
+  .page {
+    padding: var(--space-8) var(--space-6) var(--space-12);
+  }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 560px;
+}
+
+/*
+ * Cada "osso" tem o brilho próprio, mas todos usam o mesmo relógio
+ * (background-attachment: fixed): a faixa de luz atravessa a tela inteira
+ * de uma vez, em vez de cada bloco brilhar no seu ritmo.
+ */
+.bone {
+  display: block;
+  border-radius: var(--radius-full);
+  background-color: #e6e8e3;
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.75) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-size: 200vw 100%;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -150vw 0;
+  }
+  to {
+    background-position: 150vw 0;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lineXs {
+  width: 72px;
+  height: 10px;
+}
+
+.lineSm {
+  width: 84px;
+  height: 12px;
+}
+
+.lineMd {
+  width: 60%;
+  height: 12px;
+}
+
+.lineLg {
+  width: 132px;
+  height: 22px;
+}
+
+.pill {
+  width: 132px;
+  height: var(--tap-min);
+}
+
+/* O cartão de saldo é escuro no app; aqui ele já nasce mais escuro que o
+   resto, para a tela "encaixar" quando o conteúdo chegar. */
+.hero {
+  height: 176px;
+  border-radius: var(--radius-2xl);
+  background-color: #d6d9d3;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.action {
+  height: var(--tap-xl);
+  border-radius: var(--radius-xl);
+}
+
+.card {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.row + .row {
+  border-top: 1px solid var(--border-secondary);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+}
+
+.rowText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.amount {
+  width: 64px;
+  height: 14px;
+}
+
+/* ------------------------------------------------ logo (brand) */
+
+.brand {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-primary);
+}
+
+.mark {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Arco lima girando em volta do logo (máscara recorta o miolo do cone). */
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: conic-gradient(from 0deg, transparent 0deg, var(--lime) 280deg, var(--lime-strong) 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+  animation: spin 0.9s linear infinite;
+}
+
+.logo {
+  border-radius: 16px;
+  animation: breathe 1.8s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+}
+
+/* ------------------------------------------------ movimento reduzido */
+
+@media (prefers-reduced-motion: reduce) {
+  .bone {
+    animation: none;
+    background-image: none;
+  }
+
+  .ring {
+    animation-duration: 2.4s;
+  }
+
+  .logo {
+    animation: none;
+  }
+}

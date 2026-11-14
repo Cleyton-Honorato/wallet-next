@@ -1,5 +1,5 @@
-import { Spinner } from '@/components/ui/Spinner';
+import { Loading } from '@/components/ui/Loading';
 
-export default function Loading() {
-  return <Spinner fullscreen />;
+export default function AuthLoading() {
+  return <Loading variant="brand" />;
 }

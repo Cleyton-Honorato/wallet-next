@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   /* Espaço para a barra de abas não cobrir o fim da página no celular. */
-  padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  padding-bottom: var(--tabbar-space);
 }
 
 /* ------------------------------------------------ topo (computador) */
@@ -99,67 +99,14 @@
 }
 
 .toplink:focus-visible,
-.avatar:focus-visible,
-.tab:focus-visible {
+.avatar:focus-visible {
   outline: 3px solid var(--lime-strong);
   outline-offset: 2px;
-}
-
-/* ------------------------------------------------ abas (celular) */
-
-.tabbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: var(--z-sticky);
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-  background: var(--surface-card);
-  border-top: 1px solid var(--border-secondary);
-}
-
-.tab {
-  min-height: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  font-size: 12px;
-  font-weight: var(--font-semibold);
-  color: var(--text-secondary);
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tabIcon {
-  width: 60px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--transition-fast);
-}
-
-.tabActive {
-  color: var(--text-primary);
-  font-weight: var(--font-bold);
-}
-
-.tabActive .tabIcon {
-  background: var(--lime);
 }
 
 @media (min-width: 900px) {
   .topbar {
     display: block;
-  }
-
-  .tabbar {
-    display: none;
   }
 
   .content {

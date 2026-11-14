@@ -1,4 +1,5 @@
 .overlay {
+  overscroll-behavior: contain;
   position: fixed;
   inset: 0;
   z-index: var(--z-modal);
@@ -11,6 +12,7 @@
 }
 
 .modal {
+  overscroll-behavior: contain;
   background: var(--surface-elevated);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-2xl);

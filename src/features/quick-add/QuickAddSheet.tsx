@@ -1,14 +1,13 @@
 'use client';
 
 import { useId, useState, useTransition, type FormEvent } from 'react';
-import { Check } from 'lucide-react';
+import { MoreHorizontal, X } from 'lucide-react';
 import { ModalShell } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { CategoryIcon } from '@/features/categories/icon-map';
 import { cn } from '@/lib/cn';
 import { formatCurrency, formatDateForInput } from '@/lib/format';
-import { getCurrentMonthKey } from '@/lib/month';
-import { clampDueDay } from '@/lib/overdue';
+import { formatMonthKeyLabel, getCurrentMonthKey, toMonthKey } from '@/lib/month';
 import type { CategoryDto, EntryKind } from '@/lib/types';
 import {
   createFixedEntryAction,
@@ -32,18 +31,36 @@ export function parseAmount(raw: string): number {
 interface QuickAddSheetProps {
   initialKind: EntryKind;
   categories: CategoryDto[];
-  /** Mês em que o lançamento cai — o que o usuário está olhando. */
+  /** Mês que o usuário está olhando — define a data inicial do lançamento. */
   monthKey: string;
   onClose: () => void;
   onSaved: (message: string) => void;
 }
 
+type DayChoice = 'today' | 'yesterday' | 'other';
+
+function toIsoDate(date: Date): string {
+  return formatDateForInput(date);
+}
+
+function shiftDays(date: Date, delta: number): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + delta);
+}
+
+/** 'YYYY-MM-DD' → Date local (sem o deslocamento de fuso do `new Date(str)`). */
+function parseIsoDate(value: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
 /**
- * Lançamento em três toques: valor, categoria, salvar.
+ * Lançamento em três toques: valor, categoria, salvar — a tela "Lançar gasto
+ * em 3 toques" do mockup. Ocupa a tela inteira no celular.
  *
  * Por baixo continua a matriz do domínio: sem "repete" vira um variável já
- * quitado no mês; com "repete" vira um fixo, quitado no mês corrente — afinal
- * o usuário está dizendo que acabou de gastar/receber.
+ * quitado no mês da data escolhida (avulsos guardam só o mês, não o dia); com
+ * "repete" vira um fixo que vence naquele dia, já quitado naquele mês.
  */
 export function QuickAddSheet({
   initialKind,
@@ -53,12 +70,23 @@ export function QuickAddSheet({
   onSaved,
 }: QuickAddSheetProps) {
   const ids = useId();
+  const today = new Date();
+  const todayIso = toIsoDate(today);
+  const viewingCurrentMonth = monthKey === getCurrentMonthKey();
+
   const [kind, setKind] = useState<EntryKind>(initialKind);
   const [amountText, setAmountText] = useState('');
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [repeat, setRepeat] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  // Olhando um mês passado, o lançamento nasce nele, não em hoje.
+  const [dayChoice, setDayChoice] = useState<DayChoice>(
+    viewingCurrentMonth ? 'today' : 'other',
+  );
+  const [otherDate, setOtherDate] = useState(
+    viewingCurrentMonth ? todayIso : `${monthKey}-01`,
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -66,12 +94,20 @@ export function QuickAddSheet({
   const options = categories.filter(
     (c) => c.type === (isExpense ? 'EXPENSE' : 'INCOME'),
   );
-  const visible = showAll ? options : options.slice(0, VISIBLE_CATEGORIES);
+  // Duas linhas de 4: com mais de 8, o 8º espaço vira "Ver todas".
+  const collapsed = !showAll && options.length > VISIBLE_CATEGORIES;
+  const visible = collapsed ? options.slice(0, VISIBLE_CATEGORIES - 1) : options;
   const selected = options.find((c) => c.id === categoryId) ?? null;
 
   const amount = parseAmount(amountText);
   const amountOk = Number.isFinite(amount) && amount > 0;
-  const canSave = amountOk && selected !== null && !isPending;
+
+  const date =
+    dayChoice === 'today'
+      ? today
+      : dayChoice === 'yesterday'
+        ? shiftDays(today, -1)
+        : parseIsoDate(otherDate);
 
   const switchKind = (next: EntryKind) => {
     if (next === kind) return;
@@ -82,18 +118,23 @@ export function QuickAddSheet({
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
+    if (!amountOk) {
+      setError('Digite quanto foi.');
+      return;
+    }
     if (!selected) {
       setError('Escolha uma categoria.');
       return;
     }
-    if (!amountOk) {
-      setError('Digite um valor maior que zero.');
+    if (!date || toIsoDate(date) > todayIso) {
+      setError('Escolha uma data até hoje.');
       return;
     }
     setError(null);
 
     const entryTitle = title.trim() || selected.name;
     const value = Math.round(amount * 100) / 100;
+    const entryMonth = toMonthKey(date.getFullYear(), date.getMonth() + 1);
 
     startTransition(async () => {
       if (!repeat) {
@@ -102,63 +143,79 @@ export function QuickAddSheet({
           title: entryTitle,
           estimatedAmount: value,
           actualAmount: value,
-          month: monthKey,
+          month: entryMonth,
           settled: true,
         });
         if (!result.ok) return setError(result.error);
       } else {
-        const today = new Date();
-        const isCurrent = monthKey === getCurrentMonthKey();
-        const [y, m] = monthKey.split('-').map(Number);
         const created = await createFixedEntryAction(kind, {
           categoryId: selected.id,
           title: entryTitle,
           amount: value,
-          day: clampDueDay(y, m - 1, today.getDate()),
-          startDate: isCurrent ? formatDateForInput(today) : `${monthKey}-01`,
+          day: date.getDate(),
+          startDate: toIsoDate(date),
           isActive: true,
         });
         if (!created.ok) return setError(created.error);
 
         const settled = await settleFixedEntryAction(kind, {
           id: created.data.id,
-          month: monthKey,
+          month: entryMonth,
           settled: true,
         });
         if (!settled.ok) return setError(settled.error);
       }
 
+      const where =
+        entryMonth === monthKey ? '' : ` em ${formatMonthKeyLabel(entryMonth).split(' ')[0]}`;
       onSaved(
-        `${isExpense ? 'Gasto' : 'Entrada'} de ${formatCurrency(value)} anotado`,
+        `${isExpense ? 'Gasto' : 'Entrada'} de ${formatCurrency(value)} anotado${where}`,
       );
       onClose();
     });
   };
 
+  const dayChips: { id: DayChoice; label: string }[] = [
+    { id: 'today', label: 'Hoje' },
+    { id: 'yesterday', label: 'Ontem' },
+    { id: 'other', label: 'Outra data' },
+  ];
+
   return (
-    <ModalShell labelledBy={`${ids}-title`} onClose={onClose}>
+    <ModalShell labelledBy={`${ids}-title`} onClose={onClose} className={styles.sheet}>
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <h2 id={`${ids}-title`} className={styles.srOnly}>
           {isExpense ? 'Anotar gasto' : 'Anotar entrada'}
         </h2>
 
-        <div className={styles.kindToggle} role="group" aria-label="Tipo de lançamento">
+        <div className={styles.top}>
           <button
             type="button"
-            aria-pressed={isExpense}
-            className={cn(styles.kindBtn, isExpense && styles.kindBtnOn)}
-            onClick={() => switchKind('expense')}
+            className={styles.close}
+            onClick={onClose}
+            aria-label="Fechar"
           >
-            Gastei
+            <X size={20} strokeWidth={2.4} />
           </button>
-          <button
-            type="button"
-            aria-pressed={!isExpense}
-            className={cn(styles.kindBtn, !isExpense && styles.kindBtnOn)}
-            onClick={() => switchKind('income')}
-          >
-            Recebi
-          </button>
+          <div className={styles.kindToggle} role="group" aria-label="Tipo de lançamento">
+            <button
+              type="button"
+              aria-pressed={isExpense}
+              className={cn(styles.kindBtn, isExpense && styles.kindBtnOn)}
+              onClick={() => switchKind('expense')}
+            >
+              Gastei
+            </button>
+            <button
+              type="button"
+              aria-pressed={!isExpense}
+              className={cn(styles.kindBtn, !isExpense && styles.kindBtnOn)}
+              onClick={() => switchKind('income')}
+            >
+              Recebi
+            </button>
+          </div>
+          <span className={styles.topSpacer} aria-hidden />
         </div>
 
         <div className={styles.amountBlock}>
@@ -178,6 +235,21 @@ export function QuickAddSheet({
               autoFocus
             />
           </div>
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor={`${ids}-title-input`} className={styles.label}>
+            {isExpense ? 'Com o quê?' : 'De onde veio?'}{' '}
+            <span className={styles.optional}>(opcional)</span>
+          </label>
+          <input
+            id={`${ids}-title-input`}
+            className={styles.text}
+            value={title}
+            maxLength={120}
+            placeholder={isExpense ? 'Ex.: mercado da semana' : 'Ex.: salário'}
+            onChange={(e) => setTitle(e.target.value)}
+          />
         </div>
 
         <fieldset className={styles.fieldset}>
@@ -206,13 +278,16 @@ export function QuickAddSheet({
                   </button>
                 );
               })}
-              {options.length > VISIBLE_CATEGORIES && !showAll && (
+              {collapsed && (
                 <button
                   type="button"
                   className={styles.cat}
                   onClick={() => setShowAll(true)}
+                  aria-label={`Ver todas as ${options.length} categorias`}
                 >
-                  <span className={styles.catIcon}>+{options.length - VISIBLE_CATEGORIES}</span>
+                  <span className={styles.catIcon}>
+                    <MoreHorizontal size={22} />
+                  </span>
                   <span className={styles.catName}>Ver todas</span>
                 </button>
               )}
@@ -220,19 +295,35 @@ export function QuickAddSheet({
           )}
         </fieldset>
 
-        <div className={styles.field}>
-          <label htmlFor={`${ids}-title-input`} className={styles.label}>
-            {isExpense ? 'Com o quê?' : 'De onde veio?'}{' '}
-            <span className={styles.optional}>(opcional)</span>
-          </label>
-          <input
-            id={`${ids}-title-input`}
-            className={styles.text}
-            value={title}
-            maxLength={120}
-            placeholder={selected?.name ?? (isExpense ? 'Ex.: mercado da semana' : 'Ex.: salário')}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+        <div className={styles.dateBlock}>
+          <div className={styles.chips} role="group" aria-label="Quando foi">
+            {dayChips.map((chip) => (
+              <button
+                key={chip.id}
+                type="button"
+                aria-pressed={dayChoice === chip.id}
+                className={cn(styles.chip, dayChoice === chip.id && styles.chipOn)}
+                onClick={() => setDayChoice(chip.id)}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+          {dayChoice === 'other' && (
+            <div className={styles.field}>
+              <label htmlFor={`${ids}-date`} className={styles.srOnly}>
+                Data
+              </label>
+              <input
+                id={`${ids}-date`}
+                type="date"
+                className={styles.text}
+                value={otherDate}
+                max={todayIso}
+                onChange={(e) => setOtherDate(e.target.value)}
+              />
+            </div>
+          )}
         </div>
 
         <button
@@ -245,7 +336,7 @@ export function QuickAddSheet({
           <span className={styles.switchText}>
             <span className={styles.switchTitle}>Repete todo mês</span>
             <span className={styles.switchHint}>
-              {isExpense ? 'Aluguel, academia, internet…' : 'Salário, mesada, aluguel recebido…'}
+              {isExpense ? 'Ex.: aluguel, academia, internet' : 'Ex.: salário, mesada'}
             </span>
           </span>
           <span className={cn(styles.switch, repeat && styles.switchOn)} aria-hidden>
@@ -260,23 +351,8 @@ export function QuickAddSheet({
         )}
 
         <div className={styles.footer}>
-          <Button variant="ghost" size="lg" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            size="lg"
-            className={styles.save}
-            disabled={!canSave}
-            icon={isPending ? undefined : <Check size={20} />}
-          >
-            {isPending
-              ? 'Salvando…'
-              : !selected
-                ? 'Escolha a categoria'
-                : isExpense
-                  ? 'Salvar gasto'
-                  : 'Salvar entrada'}
+          <Button type="submit" size="lg" block disabled={isPending}>
+            {isPending ? 'Salvando…' : isExpense ? 'Salvar gasto' : 'Salvar entrada'}
           </Button>
         </div>
       </form>

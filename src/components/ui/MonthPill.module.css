@@ -14,10 +14,29 @@
 
 .label {
   min-width: 6.5em;
-  text-align: center;
+  height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-family: inherit;
   font-size: var(--text-sm);
   font-weight: var(--font-bold);
+  color: var(--text-primary);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.label:hover {
+  background: var(--surface-secondary);
+}
+
+.label:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 1px;
 }
 
 .arrow {
