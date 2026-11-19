@@ -32,15 +32,12 @@ export function EntryRow({
 }: EntryRowProps) {
   const isIncome = item.kind === 'income';
   const amount = monthEntryAmount(item);
-  const color = category?.color ?? '#5e645e';
 
   const body = (
     <>
-      <span
-        className={styles.icon}
-        style={{ color, backgroundColor: `${color}1f` }}
-        aria-hidden
-      >
+      {/* Como no mockup: gasto em tom neutro, entrada em verde. A cor da
+          categoria fica para a tela de Categorias — aqui ela viraria ruído. */}
+      <span className={cn(styles.icon, isIncome && styles.iconIn)} aria-hidden>
         <CategoryIcon name={category?.icon} label={category?.name} size={20} />
       </span>
       <span className={styles.text}>

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { EmergencyFundModal } from '@/features/emergency-fund/components/EmergencyFundModal';
 import { cn } from '@/lib/cn';
 import { formatCurrency } from '@/lib/format';
+import { brandTone } from '@/lib/palette';
 import { monthsRemaining, suggestedMonthly } from '@/lib/goal-pace';
 import { capitalize, formatMonthLabel } from '@/lib/period-label';
 import type { EmergencyFundDto, GoalDto } from '@/lib/types';
@@ -139,6 +140,7 @@ export function GoalsView({ goals, fund }: { goals: GoalDto[]; fund: EmergencyFu
         <div className={styles.grid}>
           {goals.map((goal) => {
             const pace = paceLabel(goal);
+            const tone = brandTone(goal.color);
             const percent = Math.min(100, Math.floor(goal.usagePercent));
             return (
               <article
@@ -148,10 +150,10 @@ export function GoalsView({ goals, fund }: { goals: GoalDto[]; fund: EmergencyFu
                 <div className={styles.cardHead}>
                   <span
                     className={styles.goalIcon}
-                    style={{ backgroundColor: `${goal.color}22`, color: goal.color }}
+                    style={{ backgroundColor: tone.soft, color: tone.color }}
                     aria-hidden
                   >
-                    <GoalIcon name={goal.icon} size={22} color={goal.color} />
+                    <GoalIcon name={goal.icon} size={22} color={tone.color} />
                   </span>
                   <span className={styles.cardText}>
                     <span className={styles.goalName}>{goal.name}</span>
@@ -169,7 +171,7 @@ export function GoalsView({ goals, fund }: { goals: GoalDto[]; fund: EmergencyFu
                 <div className={styles.track} aria-hidden>
                   <div
                     className={styles.fill}
-                    style={{ width: `${percent}%`, background: goal.color }}
+                    style={{ width: `${percent}%`, background: tone.color }}
                   />
                 </div>
                 <p className={styles.amounts}>

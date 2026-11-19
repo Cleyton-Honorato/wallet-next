@@ -1,10 +1,12 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Menu } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { MobileDrawer } from './MobileDrawer';
 import { isNavItemActive, navItems } from './navItems';
 import { TabBar } from './TabBar';
 import styles from './AppShell.module.css';
@@ -17,15 +19,51 @@ interface AppShellProps {
 /**
  * Casca da aplicação.
  *
- * - Celular: só o conteúdo e a barra de abas flutuante (TabBar).
+ * - Celular: barra fina no topo com o ☰ (abre o menu lateral), o conteúdo e
+ *   a barra de abas flutuante (TabBar).
  * - Computador: barra no topo com as mesmas abas e o avatar levando ao Perfil.
  */
 export function AppShell({ user, children }: AppShellProps) {
   const pathname = usePathname();
   const initial = user.name.charAt(0).toUpperCase();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [lastPath, setLastPath] = useState(pathname);
+
+  // Navegou (inclusive pelo "voltar"): o menu fecha.
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    if (drawerOpen) setDrawerOpen(false);
+  }
+
+  // Estável: o drawer usa no efeito que trava a rolagem e devolve o foco.
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
   return (
     <div className={styles.layout}>
+      <div className={styles.mobilebar}>
+        <button
+          type="button"
+          className={styles.menuBtn}
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Abrir menu"
+          aria-expanded={drawerOpen}
+          aria-controls="mobile-drawer"
+        >
+          <Menu size={24} />
+        </button>
+        <Link href="/" className={styles.mobileBrand}>
+          <Image src="/logo.png" alt="" width={28} height={28} />
+          <span>Wallet</span>
+        </Link>
+      </div>
+
+      <MobileDrawer
+        id="mobile-drawer"
+        open={drawerOpen}
+        onClose={closeDrawer}
+        user={user}
+      />
+
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
           <Link href="/" className={styles.brand}>

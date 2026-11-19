@@ -1,0 +1,225 @@
+/* Menu lateral do celular. Fechado: invisível e fora do caminho dos toques. */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  pointer-events: none;
+  visibility: hidden;
+  /* Espera a animação de saída terminar antes de sumir de vez. */
+  transition: visibility 0s linear 320ms;
+}
+
+.open {
+  pointer-events: auto;
+  visibility: visible;
+  transition: visibility 0s;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-overlay);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.open .overlay {
+  opacity: 1;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(84vw, 340px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--space-5) + env(safe-area-inset-top)) var(--space-4)
+    calc(var(--space-5) + env(safe-area-inset-bottom));
+  background: var(--surface-elevated);
+  border-radius: 0 var(--radius-2xl) var(--radius-2xl) 0;
+  box-shadow: var(--shadow-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  transform: translateX(-104%);
+  transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.open .panel {
+  transform: translateX(0);
+}
+
+/* Enquanto o dedo arrasta, o painel acompanha sem atraso. */
+.dragging {
+  transition: none;
+}
+
+/* ------------------------------------------------ cabeçalho */
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--ink);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  font-weight: var(--font-extrabold);
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: var(--text-lg);
+  font-weight: var(--font-extrabold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  flex-shrink: 0;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------ links */
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.link {
+  min-height: 64px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.link:hover {
+  background: var(--surface-secondary);
+}
+
+.linkActive,
+.linkActive:hover {
+  background: var(--lime-soft);
+}
+
+.linkIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linkActive .linkIcon {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+.linkText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.linkLabel {
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+}
+
+.linkHint {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------ sair */
+
+.logoutForm {
+  margin-top: auto;
+}
+
+.logout {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--surface-secondary);
+  color: var(--color-danger-600);
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: var(--color-danger-50);
+}
+
+.close:focus-visible,
+.link:focus-visible,
+.logout:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .panel {
+    transition: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .root {
+    display: none;
+  }
+}

@@ -102,7 +102,7 @@
 }
 
 .barFill[data-over='true'] {
-  background: #ffb36b;
+  background: #f4b48f; /* pêssego da escala Tertiary */
 }
 
 .heroFoot {

@@ -6,6 +6,7 @@ import { QuickAdd } from '@/features/quick-add/QuickAdd';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { formatMonthKeyLabel, getCurrentMonthKey } from '@/lib/month';
 import { byMostRecent } from '@/lib/month-entry';
+import { brandTone } from '@/lib/palette';
 import type {
   CategoryDto,
   DashboardSummaryDto,
@@ -186,7 +187,10 @@ export function HomeView({
                   <span className={styles.savingsTrack} aria-hidden>
                     <span
                       className={styles.savingsFill}
-                      style={{ width: `${Math.min(100, g.usagePercent)}%`, background: g.color }}
+                      style={{
+                        width: `${Math.min(100, g.usagePercent)}%`,
+                        background: brandTone(g.color).color,
+                      }}
                     />
                   </span>
                   <span className={styles.savingsValue}>{formatCurrency(g.balance)}</span>

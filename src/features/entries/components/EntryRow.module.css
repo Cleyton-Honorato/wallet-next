@@ -51,6 +51,13 @@ button.main:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.iconIn {
+  background: var(--color-income-bg);
+  color: var(--color-income);
 }
 
 .text {

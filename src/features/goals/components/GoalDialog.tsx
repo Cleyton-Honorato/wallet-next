@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { cn } from '@/lib/cn';
-import { AVAILABLE_COLORS } from '@/lib/palette';
+import { BRAND_TONES, brandTone } from '@/lib/palette';
 import type { GoalDto } from '@/lib/types';
 import { createGoalAction, updateGoalAction } from '@/server/actions/goals';
 import { AVAILABLE_GOAL_ICONS, GoalIcon, type GoalIconName } from '../icon-map';
@@ -26,7 +26,8 @@ function buildInitialState(editing: GoalDto | null): FormState {
       targetAmount: String(editing.targetAmount),
       targetDate: editing.targetDate ?? '',
       icon: (editing.icon as GoalIconName | null) ?? AVAILABLE_GOAL_ICONS[0],
-      color: editing.color,
+      // Cor antiga do banco já abre convertida para o tom da paleta.
+      color: brandTone(editing.color).color,
     };
   }
   return {
@@ -34,7 +35,8 @@ function buildInitialState(editing: GoalDto | null): FormState {
     targetAmount: '',
     targetDate: '',
     icon: AVAILABLE_GOAL_ICONS[0],
-    color: AVAILABLE_COLORS[10],
+    // Meta nova nasce azul, como as metas do mockup.
+    color: BRAND_TONES.find((tone) => tone.id === 'azul')!.color,
   };
 }
 
@@ -87,7 +89,7 @@ export function GoalDialog({
           <div className={styles.preview}>
             <div
               className={styles.iconBox}
-              style={{ backgroundColor: `${form.color}22` }}
+              style={{ backgroundColor: brandTone(form.color).soft }}
             >
               <GoalIcon name={form.icon} size={22} color={form.color} />
             </div>
@@ -168,18 +170,19 @@ export function GoalDialog({
           <div>
             <span className={styles.fieldLabel}>Cor</span>
             <div className={styles.colorGrid}>
-              {AVAILABLE_COLORS.map((color) => (
+              {BRAND_TONES.map((tone) => (
                 <button
-                  key={color}
+                  key={tone.id}
                   type="button"
                   className={cn(
                     styles.colorCircle,
-                    form.color === color && styles.colorCircleActive,
+                    form.color === tone.color && styles.colorCircleActive,
                   )}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setForm((p) => ({ ...p, color }))}
-                  aria-label={`Cor ${color}`}
-                  aria-pressed={form.color === color}
+                  style={{ backgroundColor: tone.color }}
+                  onClick={() => setForm((p) => ({ ...p, color: tone.color }))}
+                  title={tone.name}
+                  aria-label={`Cor ${tone.name}`}
+                  aria-pressed={form.color === tone.color}
                 />
               ))}
             </div>

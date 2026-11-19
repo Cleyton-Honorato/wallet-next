@@ -10,8 +10,8 @@ import {
   createCategoryAction,
   updateCategoryAction,
 } from '@/server/actions/categories';
+import { BRAND_TONES, brandTone } from '@/lib/palette';
 import {
-  AVAILABLE_COLORS,
   AVAILABLE_ICONS,
   CategoryIcon,
   type CategoryIconName,
@@ -36,14 +36,15 @@ function buildInitialState(
       icon:
         (editing.icon as CategoryIconName | null) ??
         AVAILABLE_ICONS[editing.type][0],
-      color: editing.color,
+      // Cor antiga do banco já abre convertida para o tom da paleta.
+      color: brandTone(editing.color).color,
     };
   }
   return {
     name: '',
     type: defaultType,
     icon: AVAILABLE_ICONS[defaultType][0],
-    color: AVAILABLE_COLORS[0],
+    color: BRAND_TONES[0].color,
   };
 }
 
@@ -118,9 +119,9 @@ export function CategoryDialog({
           <div className={styles.preview}>
             <div
               className={styles.previewIcon}
-              style={{ backgroundColor: `${form.color}22` }}
+              style={{ backgroundColor: brandTone(form.color).soft }}
             >
-              <CategoryIcon name={form.icon} size={20} color={form.color} />
+              <CategoryIcon name={form.icon} label={form.name} size={20} color={form.color} />
             </div>
             <span className={styles.previewName}>
               {form.name || 'Nome da categoria'}
@@ -199,19 +200,19 @@ export function CategoryDialog({
           <div>
             <span className={styles.fieldLabel}>Cor</span>
             <div className={styles.colorGrid}>
-              {AVAILABLE_COLORS.map((color) => (
+              {BRAND_TONES.map((tone) => (
                 <button
-                  key={color}
+                  key={tone.id}
                   type="button"
                   className={cn(
                     styles.colorCircle,
-                    form.color === color && styles.colorCircleActive,
+                    form.color === tone.color && styles.colorCircleActive,
                   )}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setForm((prev) => ({ ...prev, color }))}
-                  title={color}
-                  aria-label={`Cor ${color}`}
-                  aria-pressed={form.color === color}
+                  style={{ backgroundColor: tone.color }}
+                  onClick={() => setForm((prev) => ({ ...prev, color: tone.color }))}
+                  title={tone.name}
+                  aria-label={`Cor ${tone.name}`}
+                  aria-pressed={form.color === tone.color}
                 />
               ))}
             </div>

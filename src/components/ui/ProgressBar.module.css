@@ -19,12 +19,14 @@
   transition: width var(--transition-base);
 }
 
+/* Como no mockup: progresso normal em tinta; laranja quando chega perto do
+   limite; vermelho-terra só quando estoura. */
 .fill.ok {
-  background: var(--color-success-500);
+  background: var(--ink);
 }
 
 .fill.warning {
-  background: var(--color-warning-500);
+  background: var(--color-alert);
 }
 
 .fill.over {

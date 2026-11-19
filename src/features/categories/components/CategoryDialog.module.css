@@ -65,12 +65,12 @@
 }
 
 .radioIncome {
-  color: var(--color-income, #16a34a);
+  color: var(--color-income);
   font-weight: var(--font-medium);
 }
 
 .radioExpense {
-  color: var(--color-expense, #dc2626);
+  color: var(--color-expense);
   font-weight: var(--font-medium);
 }
 
@@ -102,7 +102,7 @@
 
 .iconBtnActive {
   border-color: var(--color-primary-500);
-  background: var(--color-primary-50, #eff6ff);
+  background: var(--color-primary-50);
 }
 
 /* Color picker */

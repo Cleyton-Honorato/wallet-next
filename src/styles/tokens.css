@@ -10,37 +10,53 @@
    ============================================ */
 
 :root {
-  /* === Marca === */
-  --ink: #121412;
-  --ink-soft: #2e322e;
-  --lime: #d4f36b;
-  --lime-strong: #c2e64a;
-  --lime-soft: #eef9cc;
+  /* ============================================================
+     Branding original do Wallet (Figma "wallet branding"):
+       Primary   #002366  azul-marinho — a marca
+       Secondary #00C853  verde do "W" — o destaque
+       Tertiary  #501300  marrom → pêssego — alertas
+       Neutral   #F8F9FA  cinzas — fundos e textos
+     Os nomes --ink/--lime ficaram por compatibilidade com os módulos
+     CSS: --ink é o azul-marinho da marca, --lime é o verde da marca.
+     ============================================================ */
 
-  /* === "Primária" = tinta. Botões principais ficam pretos. === */
-  --color-primary-50: #f2f3ef;
-  --color-primary-100: #e6f6b0; /* anel de foco */
-  --color-primary-200: #d9dcd5;
-  --color-primary-300: #9aa09a;
-  --color-primary-400: #3b403b;
-  --color-primary-500: #121412;
-  --color-primary-600: #121412;
-  --color-primary-700: #121412;
-  --color-primary-800: #121412;
-  --color-primary-900: #121412;
+  /* === Marca === */
+  --brand-primary: #002366;
+  --brand-secondary: #00c853;
+  --brand-tertiary: #501300;
+  --brand-neutral: #f8f9fa;
+
+  --ink: var(--brand-primary);       /* superfícies escuras, botões principais */
+  --ink-soft: #0b3486;               /* hover do azul / trilho sobre o azul */
+  --lime: var(--brand-secondary);    /* destaque; texto em cima dele é azul */
+  --lime-strong: #00a845;
+  --lime-soft: #d9f7e5;
+
+  /* === "Primária" = azul-marinho da marca === */
+  --color-primary-50: #eef2fa;
+  --color-primary-100: #c7f2d9; /* anel de foco (verde claro) */
+  --color-primary-200: #c9d4ec;
+  --color-primary-300: #8fa3cf;
+  --color-primary-400: #2d4a8a;
+  --color-primary-500: #002366;
+  --color-primary-600: #002366;
+  --color-primary-700: #001b4f;
+  --color-primary-800: #00143b;
+  --color-primary-900: #000d27;
 
   /* === Estados === */
-  --color-success-50: #e3f2ea;
-  --color-success-100: #cfe9db;
-  --color-success-500: #18794e;
-  --color-success-600: #18794e;
-  --color-success-700: #11603d;
+  /* Verde da escala Secondary, escurecido para texto ler bem no branco. */
+  --color-success-50: #e0f7ea;
+  --color-success-100: #c2efd5;
+  --color-success-500: #007a35;
+  --color-success-600: #007a35;
+  --color-success-700: #005f29;
 
-  /* Laranja em vez de vermelho para "atenção": menos alarme, mais legível. */
-  --color-warning-50: #fef0e1;
-  --color-warning-100: #fde2c4;
-  --color-warning-500: #b54708;
-  --color-warning-600: #8a3a06;
+  /* Alertas na escala Tertiary (marrom → pêssego). */
+  --color-warning-50: #fbe9df;
+  --color-warning-100: #f6d2bf;
+  --color-warning-500: #b5532f;
+  --color-warning-600: #501300;
 
   --color-danger-50: #fdecea;
   --color-danger-100: #f9d4cf;
@@ -48,50 +64,51 @@
   --color-danger-600: #a1270a;
   --color-danger-700: #7d1e08;
 
-  --color-gray-50: #f7f8f5;
-  --color-gray-100: #f2f3ef;
-  --color-gray-200: #e4e6e1;
-  --color-gray-300: #dcdfd8;
-  --color-gray-400: #9aa09a;
-  --color-gray-500: #5e645e;
-  --color-gray-600: #4a4f4a;
-  --color-gray-700: #3b403b;
-  --color-gray-800: #232623;
-  --color-gray-900: #121412;
-  --color-gray-950: #0a0b0a;
+  /* Escala Neutral. */
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #f1f3f5;
+  --color-gray-200: #e5e8ec;
+  --color-gray-300: #dde1e6;
+  --color-gray-400: #a6adb6;
+  --color-gray-500: #5f6670;
+  --color-gray-600: #4a5059;
+  --color-gray-700: #363b42;
+  --color-gray-800: #22262b;
+  --color-gray-900: #14171a;
+  --color-gray-950: #0a0c0e;
 
   /* === Semânticas === */
-  --color-income: #18794e;
-  --color-income-bg: #e3f2ea;
-  --color-expense: #121412;
-  --color-expense-bg: #f2f3ef;
-  --color-transfer: #3046b8;
-  --color-transfer-bg: #e8edff;
-  --color-alert: #b54708;
-  --color-alert-text: #8a3a06;
-  --color-alert-bg: #fef0e1;
+  --color-income: #007a35;
+  --color-income-bg: #e0f7ea;
+  --color-expense: #14171a;
+  --color-expense-bg: #f1f3f5;
+  --color-transfer: #002366;
+  --color-transfer-bg: #eef2fa;
+  --color-alert: #b5532f;
+  --color-alert-text: #501300;
+  --color-alert-bg: #fbe9df;
 
   /* === Superfícies === */
-  --surface-primary: #f2f3ef;   /* fundo da página */
-  --surface-secondary: #f2f3ef; /* blocos dentro de cards */
+  --surface-primary: #f1f3f5;   /* fundo da página (escala Neutral) */
+  --surface-secondary: #f1f3f5; /* blocos dentro de cards */
   --surface-elevated: #ffffff;  /* modais, sheets */
-  --surface-overlay: rgba(18, 20, 18, 0.45);
+  --surface-overlay: rgba(0, 20, 60, 0.45);
   --surface-sidebar: #ffffff;
   --surface-card: #ffffff;
-  --surface-inverse: #121412;
+  --surface-inverse: #002366;   /* cartão de saldo */
 
   /* === Bordas === */
-  --border-primary: #dcdfd8;
-  --border-secondary: #eef0eb;
-  --border-focus: #121412;
+  --border-primary: #dde1e6;
+  --border-secondary: #eceff2;
+  --border-focus: #002366;
 
   /* === Texto === */
-  --text-primary: #121412;
-  --text-secondary: #5e645e;
-  --text-tertiary: #7a807a;
+  --text-primary: #14171a;
+  --text-secondary: #5f6670;
+  --text-tertiary: #7a828c;
   --text-inverse: #ffffff;
-  --text-inverse-muted: #c4c9c3;
-  --text-link: #121412;
+  --text-inverse-muted: #b8c3da;
+  --text-link: #002366;
 
   /* === Espaçamento === */
   --space-0: 0;
@@ -152,12 +169,12 @@
   --radius-full: 9999px;
 
   /* === Sombras — quase nenhuma; a hierarquia vem da cor === */
-  --shadow-xs: 0 1px 2px rgba(18, 20, 18, 0.04);
-  --shadow-sm: 0 1px 3px rgba(18, 20, 18, 0.06);
-  --shadow-md: 0 6px 16px -4px rgba(18, 20, 18, 0.1);
-  --shadow-lg: 0 12px 28px -8px rgba(18, 20, 18, 0.14);
-  --shadow-xl: 0 20px 40px -12px rgba(18, 20, 18, 0.18);
-  --shadow-2xl: 0 24px 60px -16px rgba(18, 20, 18, 0.28);
+  --shadow-xs: 0 1px 2px rgba(0, 20, 60, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 60, 0.06);
+  --shadow-md: 0 6px 16px -4px rgba(0, 20, 60, 0.1);
+  --shadow-lg: 0 12px 28px -8px rgba(0, 20, 60, 0.14);
+  --shadow-xl: 0 20px 40px -12px rgba(0, 20, 60, 0.18);
+  --shadow-2xl: 0 24px 60px -16px rgba(0, 20, 60, 0.28);
 
   /* === Transições === */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);

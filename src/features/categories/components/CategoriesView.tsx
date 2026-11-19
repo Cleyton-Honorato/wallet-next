@@ -5,6 +5,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { BackLink } from '@/components/ui/BackLink';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/cn';
+import { brandTone } from '@/lib/palette';
 import type { CategoryDto, CategoryType } from '@/lib/types';
 import { deleteCategoryAction } from '@/server/actions/categories';
 import { CategoryIcon } from '../icon-map';
@@ -21,6 +22,7 @@ function CategoryCard({
   onDelete: () => void;
 }) {
   const isIncome = category.type === 'INCOME';
+  const tone = brandTone(category.color);
 
   return (
     <div className={styles.categoryCard}>
@@ -28,9 +30,9 @@ function CategoryCard({
         <div className={styles.categoryCardLeft}>
           <div
             className={styles.iconContainer}
-            style={{ backgroundColor: `${category.color}22` }}
+            style={{ backgroundColor: tone.soft }}
           >
-            <CategoryIcon name={category.icon} label={category.name} size={22} color={category.color} />
+            <CategoryIcon name={category.icon} label={category.name} size={22} color={tone.color} />
           </div>
           <div className={styles.categoryMeta}>
             <span className={styles.categoryName}>{category.name}</span>
@@ -69,7 +71,7 @@ function CategoryCard({
 
       <div
         className={styles.categoryAccent}
-        style={{ backgroundColor: category.color }}
+        style={{ backgroundColor: tone.color }}
       />
     </div>
   );

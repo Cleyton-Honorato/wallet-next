@@ -9,6 +9,7 @@ import { BackLink } from '@/components/ui/BackLink';
 import { MonthPill } from '@/components/ui/MonthPill';
 import { getBudgetStatus } from '@/lib/budget';
 import { cn } from '@/lib/cn';
+import { brandTone } from '@/lib/palette';
 import { formatCurrency } from '@/lib/format';
 import { capitalize, formatMonthLabel } from '@/lib/period-label';
 import type { CategoryDto, MonthlyBudgetDto } from '@/lib/types';
@@ -183,7 +184,7 @@ export function BudgetsView({
                     <div className={styles.lineHead}>
                       <span
                         className={styles.dot}
-                        style={{ backgroundColor: line.color }}
+                        style={{ backgroundColor: brandTone(line.color).color }}
                         aria-hidden
                       />
                       <span className={styles.categoryName}>

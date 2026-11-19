@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#f2f3ef',
+  themeColor: '#f1f3f5',
   // Deixa o conteúdo ir até as bordas no iPhone; os env(safe-area-inset-*)
   // do CSS cuidam do notch e da barra de gestos.
   viewportFit: 'cover',

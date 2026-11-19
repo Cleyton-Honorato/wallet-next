@@ -13,6 +13,54 @@
   padding-bottom: var(--tabbar-space);
 }
 
+/* ------------------------------------------------ topo (celular) */
+
+.mobilebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: calc(var(--space-2) + env(safe-area-inset-top)) var(--space-3) 0;
+}
+
+.menuBtn {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.menuBtn:hover {
+  background: var(--surface-card);
+}
+
+.menuBtn:focus-visible,
+.mobileBrand:focus-visible {
+  outline: 3px solid var(--lime-strong);
+  outline-offset: 2px;
+}
+
+.mobileBrand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  font-size: var(--text-lg);
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.mobileBrand img {
+  border-radius: 8px;
+}
+
 /* ------------------------------------------------ topo (computador) */
 
 .topbar {
@@ -107,6 +155,10 @@
 @media (min-width: 900px) {
   .topbar {
     display: block;
+  }
+
+  .mobilebar {
+    display: none;
   }
 
   .content {

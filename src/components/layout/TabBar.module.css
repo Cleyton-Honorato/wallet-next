@@ -24,8 +24,8 @@
   border-radius: var(--radius-full);
   background: var(--ink);
   box-shadow:
-    0 12px 32px -8px rgba(18, 20, 18, 0.45),
-    0 2px 6px rgba(18, 20, 18, 0.18);
+    0 12px 32px -8px rgba(0, 35, 102, 0.45),
+    0 2px 6px rgba(0, 35, 102, 0.18);
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   pointer-events: auto;
@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9aa09a;
+  color: #9fb0d0; /* ícones inativos sobre o azul-marinho */
   text-decoration: none;
   transition: color 250ms ease, transform var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
