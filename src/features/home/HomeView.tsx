@@ -55,6 +55,7 @@ export function HomeView({
   const firstName = userName.split(' ')[0];
   const monthName = formatMonthKeyLabel(monthKey).split(' ')[0];
   const isCurrentMonth = monthKey === getCurrentMonthKey();
+  const isFutureMonth = monthKey > getCurrentMonthKey();
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
   const income = summary.income.total;
@@ -75,14 +76,21 @@ export function HomeView({
           <span className={styles.helloSmall}>{greeting(new Date())},</span>
           <h1 className={styles.helloName}>{firstName}</h1>
         </div>
-        <MonthPill monthKey={monthKey} />
+        <MonthPill monthKey={monthKey} allowFuture />
       </header>
 
       <div className={styles.grid}>
         <div className={styles.colMain}>
           <section className={styles.hero} aria-label="Resumo do mês">
             <span className={styles.heroLabel}>
-              {balance >= 0 ? 'Sobrou' : 'Faltou'} em {monthName}
+              {isFutureMonth
+                ? balance >= 0
+                  ? 'Vai sobrar'
+                  : 'Vai faltar'
+                : balance >= 0
+                  ? 'Sobrou'
+                  : 'Faltou'}{' '}
+              em {monthName}
             </span>
             <p className={styles.heroValue}>
               {balance < 0 && '− '}
@@ -104,8 +112,12 @@ export function HomeView({
               />
             </div>
             <div className={styles.heroFoot}>
-              <span>Gastou {formatCurrency(spent)}</span>
-              <span>Entrou {formatCurrency(income)}</span>
+              <span>
+                {isFutureMonth ? 'Previsto gastar' : 'Gastou'} {formatCurrency(spent)}
+              </span>
+              <span>
+                {isFutureMonth ? 'Previsto entrar' : 'Entrou'} {formatCurrency(income)}
+              </span>
             </div>
           </section>
 

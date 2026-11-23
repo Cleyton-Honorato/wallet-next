@@ -58,9 +58,10 @@ function parseIsoDate(value: string): Date | null {
  * Lançamento em três toques: valor, categoria, salvar — a tela "Lançar gasto
  * em 3 toques" do mockup. Ocupa a tela inteira no celular.
  *
- * Por baixo continua a matriz do domínio: sem "repete" vira um variável já
- * quitado no mês da data escolhida (avulsos guardam só o mês, não o dia); com
- * "repete" vira um fixo que vence naquele dia, já quitado naquele mês.
+ * Por baixo continua a matriz do domínio: sem "repete" vira um variável no
+ * mês da data escolhida (avulsos guardam só o mês, não o dia); com "repete"
+ * vira um fixo que vence naquele dia. A data pode ser futura, e o lançamento
+ * nasce pendente (a pagar / a receber) a menos que se marque "Já paguei".
  */
 export function QuickAddSheet({
   initialKind,
@@ -79,6 +80,7 @@ export function QuickAddSheet({
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [repeat, setRepeat] = useState(false);
+  const [settled, setSettled] = useState(false);
   const [showAll, setShowAll] = useState(false);
   // Olhando um mês passado, o lançamento nasce nele, não em hoje.
   const [dayChoice, setDayChoice] = useState<DayChoice>(
@@ -126,8 +128,8 @@ export function QuickAddSheet({
       setError('Escolha uma categoria.');
       return;
     }
-    if (!date || toIsoDate(date) > todayIso) {
-      setError('Escolha uma data até hoje.');
+    if (!date) {
+      setError('Escolha uma data.');
       return;
     }
     setError(null);
@@ -142,9 +144,9 @@ export function QuickAddSheet({
           categoryId: selected.id,
           title: entryTitle,
           estimatedAmount: value,
-          actualAmount: value,
+          actualAmount: settled ? value : null,
           month: entryMonth,
-          settled: true,
+          settled,
         });
         if (!result.ok) return setError(result.error);
       } else {
@@ -158,18 +160,21 @@ export function QuickAddSheet({
         });
         if (!created.ok) return setError(created.error);
 
-        const settled = await settleFixedEntryAction(kind, {
-          id: created.data.id,
-          month: entryMonth,
-          settled: true,
-        });
-        if (!settled.ok) return setError(settled.error);
+        if (settled) {
+          const result = await settleFixedEntryAction(kind, {
+            id: created.data.id,
+            month: entryMonth,
+            settled: true,
+          });
+          if (!result.ok) return setError(result.error);
+        }
       }
 
       const where =
         entryMonth === monthKey ? '' : ` em ${formatMonthKeyLabel(entryMonth).split(' ')[0]}`;
+      const pending = settled ? '' : isExpense ? ' (a pagar)' : ' (a receber)';
       onSaved(
-        `${isExpense ? 'Gasto' : 'Entrada'} de ${formatCurrency(value)} anotado${where}`,
+        `${isExpense ? 'Gasto' : 'Entrada'} de ${formatCurrency(value)} anotado${where}${pending}`,
       );
       onClose();
     });
@@ -296,7 +301,7 @@ export function QuickAddSheet({
         </fieldset>
 
         <div className={styles.dateBlock}>
-          <div className={styles.chips} role="group" aria-label="Quando foi">
+          <div className={styles.chips} role="group" aria-label="Quando">
             {dayChips.map((chip) => (
               <button
                 key={chip.id}
@@ -319,30 +324,31 @@ export function QuickAddSheet({
                 type="date"
                 className={styles.text}
                 value={otherDate}
-                max={todayIso}
                 onChange={(e) => setOtherDate(e.target.value)}
               />
             </div>
           )}
         </div>
 
-        <button
-          type="button"
-          role="switch"
-          aria-checked={repeat}
-          className={styles.switchRow}
-          onClick={() => setRepeat((v) => !v)}
-        >
-          <span className={styles.switchText}>
-            <span className={styles.switchTitle}>Repete todo mês</span>
-            <span className={styles.switchHint}>
-              {isExpense ? 'Ex.: aluguel, academia, internet' : 'Ex.: salário, mesada'}
-            </span>
-          </span>
-          <span className={cn(styles.switch, repeat && styles.switchOn)} aria-hidden>
-            <span className={styles.knob} />
-          </span>
-        </button>
+        <SwitchRow
+          checked={settled}
+          onToggle={() => setSettled((v) => !v)}
+          title={isExpense ? 'Já paguei' : 'Já recebi'}
+          hint={
+            settled
+              ? 'Entra como pago no mês'
+              : isExpense
+                ? 'Fica como conta a pagar'
+                : 'Fica como valor a receber'
+          }
+        />
+
+        <SwitchRow
+          checked={repeat}
+          onToggle={() => setRepeat((v) => !v)}
+          title="Repete todo mês"
+          hint={isExpense ? 'Ex.: aluguel, academia, internet' : 'Ex.: salário, mesada'}
+        />
 
         {error && (
           <p className={styles.error} role="alert">
@@ -357,5 +363,35 @@ export function QuickAddSheet({
         </div>
       </form>
     </ModalShell>
+  );
+}
+
+function SwitchRow({
+  checked,
+  onToggle,
+  title,
+  hint,
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  title: string;
+  hint: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      className={styles.switchRow}
+      onClick={onToggle}
+    >
+      <span className={styles.switchText}>
+        <span className={styles.switchTitle}>{title}</span>
+        <span className={styles.switchHint}>{hint}</span>
+      </span>
+      <span className={cn(styles.switch, checked && styles.switchOn)} aria-hidden>
+        <span className={styles.knob} />
+      </span>
+    </button>
   );
 }

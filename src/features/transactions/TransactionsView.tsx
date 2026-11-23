@@ -152,7 +152,7 @@ export function TransactionsView({
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>Lançamentos</h1>
-        <MonthPill monthKey={monthKey} />
+        <MonthPill monthKey={monthKey} allowFuture />
       </header>
 
       <div className={styles.totals}>

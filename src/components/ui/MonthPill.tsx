@@ -12,7 +12,7 @@ import styles from './MonthPill.module.css';
  * Troca de mês em uma pílula só: as setas andam um mês; tocar no nome abre
  * o seletor de mês e ano. O mês vive na URL (`?month=YYYY-MM`) e os demais
  * parâmetros (ex.: filtro) são preservados. Não avança além do mês corrente,
- * a não ser com `allowFuture` (limites de gasto).
+ * a não ser com `allowFuture` (lançamentos e limites, que planejam meses à frente).
  */
 export function MonthPill({
   monthKey,
